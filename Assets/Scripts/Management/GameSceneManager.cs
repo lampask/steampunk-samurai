@@ -12,8 +12,7 @@ public class GameSceneManager : MonoBehaviour
     public enum SceneIndexs {
         MANAGER = 0,
         MENU_SCREEN = 1,
-        GAME = 2,
-        CREDITS = 3
+        GAME = 2
     }
 
     private void Awake() {
@@ -27,7 +26,7 @@ public class GameSceneManager : MonoBehaviour
 
     List<AsyncOperation> loading = new List<AsyncOperation>(); 
 
-    public void LoadGame(SceneIndexs current) {
+    public void LoadScene(SceneIndexs current, SceneIndexs target) {
         loadingScreen.SetActive(true);
 
         loading.Add(SceneManager.UnloadSceneAsync((int) current));
@@ -38,10 +37,15 @@ public class GameSceneManager : MonoBehaviour
 
     // default overload
     public void LoadGame() {
-        LoadGame(SceneIndexs.MENU_SCREEN);
+        LoadScene(SceneIndexs.MENU_SCREEN, SceneIndexs.GAME);
     }
 
-    float totalLoadingProgress;
+
+    public void LoadCharacterSelection() {
+        
+    }
+
+    public float totalLoadingProgress;
     public IEnumerator GetLoadProgress() {
         for(int i = 0; i<loading.Count; i++) {
             while (!loading[i].isDone) {
@@ -53,10 +57,11 @@ public class GameSceneManager : MonoBehaviour
 
                 totalLoadingProgress /= loading.Count;
 
+                // Update progress
+
                 yield return null;
             }
         }
-        //yield return new WaitForSeconds(2);
         loading.Clear();
         loadingScreen.SetActive(false);
     }

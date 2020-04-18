@@ -1,10 +1,29 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerInfo : MonoBehaviour
 {
-    private void OnEnable() {
+    private Image[] imgs;
+
+    public Sprite player_icon;
+    [Header("Health bar")]
+    public Sprite hbar_bg;
+    public Sprite hbar_fill;
+    [Header("Energy bar")]
+    public Sprite ebar_bg;
+    public Sprite ebar_fill;
+
+    private void Awake() {
+        imgs = GetComponentsInChildren<Image>();
+        imgs[0].sprite = player_icon;
+        imgs[1].sprite = hbar_bg;
+        imgs[2].sprite = hbar_fill;
+        imgs[3].sprite = ebar_bg;
+        imgs[4].sprite = ebar_fill;
+    }
+
+    private void Start() {
         int index = transform.GetSiblingIndex();
-        Debug.Log(index);
         if (index % 2 == 1) {
             Reverse();
         }
