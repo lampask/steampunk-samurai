@@ -1,18 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System;
 
-public class Utils : MonoBehaviour
+public static class Utils
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [AttributeUsage(AttributeTargets.Field, Inherited = true)]
+    public class ReadOnlyAttribute : PropertyAttribute { }
+    #if UNITY_EDITOR
+        [UnityEditor.CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
+        public class ReadOnlyAttributeDrawer : UnityEditor.PropertyDrawer
+        {
+            public override void OnGUI(Rect rect, UnityEditor.SerializedProperty prop, GUIContent label)
+            {
+                bool wasEnabled = GUI.enabled;
+                GUI.enabled = false;
+                UnityEditor.EditorGUI.PropertyField(rect, prop);
+                GUI.enabled = wasEnabled;
+            }
+        }
+    #endif
 }

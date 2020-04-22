@@ -217,6 +217,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loadingScreen: {fileID: 544650588}
+  totalLoadingProgress: 0
 --- !u!4 &178884907
 Transform:
   m_ObjectHideFlags: 0
