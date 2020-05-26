@@ -12,8 +12,13 @@ public class MenuManager : MonoBehaviour
     public class Binding {
         public Button button;
         public Button.ButtonClickedEvent binding;
-        Binding() {
-            binding = button.onClick;
+        public Binding()
+        {
+            if (button != null)
+            {
+                var onClick = button.onClick;
+                binding = onClick != null ? onClick : new Button.ButtonClickedEvent();
+            }
         }
     }
     public Binding[] bindings;
@@ -40,7 +45,7 @@ public class MenuManager : MonoBehaviour
     // Menu Events
 
     public void Play() {
-        GameSceneManager.instance.LoadGame();
+        GlobalGameManager.instance.LoadGame();
     }
 
     public void Default() {

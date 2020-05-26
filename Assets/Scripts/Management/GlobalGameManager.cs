@@ -1,14 +1,20 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Console;
+using Console.Commands;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class GameSceneManager : MonoBehaviour
+public class GlobalGameManager : MonoBehaviour
 {
-    public static GameSceneManager instance;
+    public static GlobalGameManager instance;
     public GameObject loadingScreen;
-
+    
+    // Preserve game state 
+    private List<ICommand> gameCommands;
+    
     public enum SceneIndexs {
         MANAGER = 0,
         MENU_SCREEN = 1,
@@ -20,8 +26,17 @@ public class GameSceneManager : MonoBehaviour
             instance = this;
         else
             Destroy(this);
-
+        
+        gameCommands = new List<ICommand>();
+        
+        // Load Menu 
         SceneManager.LoadSceneAsync((int) SceneIndexs.MENU_SCREEN, LoadSceneMode.Additive);
+    }
+
+    private void Start()
+    {
+        // Initialise console system
+        gameCommands.Add(new QuitCommand());
     }
 
     List<AsyncOperation> loading = new List<AsyncOperation>(); 

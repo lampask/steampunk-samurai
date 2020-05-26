@@ -1,0 +1,26 @@
+﻿namespace Console.Commands
+{
+    public sealed class PresetCommand : AbstractCommand
+    {
+        public override string name { get; protected set; }
+        public override string command { get; protected set; }
+        public override string description { get; protected set; }
+        public override string help { get; protected set; }
+        
+        public override bool OnCommand(string[] args)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public QuitCommand()
+        {
+            name = "PresetCommand";
+            command = "preset";
+            description = "Serves as an example how to structure new commands added to system.";
+            help = "preset";
+            
+            // Integrate
+            GlobalConsole.instance.AddCommand(name, this);
+        }
+    }
+}

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Runtime.CompilerServices;
 
 public static class Utils
 {
@@ -18,4 +19,5 @@ public static class Utils
             }
         }
     #endif
+
 }
