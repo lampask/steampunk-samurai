@@ -771,7 +771,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 1.4
   m_Material: {fileID: 6200000, guid: 25bcde10cc28db2448c0e52e93850168, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 0
@@ -802,10 +802,12 @@ MonoBehaviour:
   rightOffset: {x: 0.2, y: 0}
   leftOffset: {x: -0.2, y: 0}
   canMove: 1
-  jumpForce: 5
+  jumpForce: 6
   speed: 5
-  fallMultiplier: 2.5
-  lowJumpMultiplier: 2
+  fallMultiplier: 3
+  lowJumpMultiplier: 2.5
+  movementFactor: 0.2
+  a: 0
 --- !u!1 &1205451508
 GameObject:
   m_ObjectHideFlags: 0
@@ -1417,7 +1419,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3aefe1d254144e547821da748e175a0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp_bar: {fileID: 1668436910}
+  hpBar: {fileID: 1668436910}
 --- !u!224 &2070385440 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4384274822309869936, guid: 1ecb840f99b122f40880ecd0ae53d5cc,

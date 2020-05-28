@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -57,6 +59,7 @@ namespace Console {
             {
                 consoleInput.placeholder.gameObject.SetActive(false);
                 Compact(false);
+                
             });
             
             // Deselect console
@@ -82,7 +85,7 @@ namespace Console {
                         }
                         else
                         {
-                            Error("The command specified doesn't exist");
+                            Error($"The command '{args[0]}' doesn't exist");
                         }
                     }
                 }
@@ -101,7 +104,7 @@ namespace Console {
         }
         
         // Update is called once per frame
-        private void Update()
+        private async void Update()
         {
             if (Input.GetKeyDown(mainTrigger))
             {
@@ -109,19 +112,28 @@ namespace Console {
                 {
                     if (mode == ConsoleMode.Execution)
                     {
-                        consoleInput.Select();
-                        consoleInput.ActivateInputField();
-                        if (!Input.GetKey(stayTrigger)) return;
+                        if (!Input.GetKey(stayTrigger))
+                        {
+                            await EnableEdit();
+                            return;
+                        }
                     }
                     HideConsole();
                 }
                 else
                 {
                     OpenConsole(!Input.GetKey(stayTrigger));
+                    await EnableEdit();
                 }
             }
         }
-        
+
+        private async Task EnableEdit()
+        {
+            await Task.Delay(TimeSpan.FromSeconds(0.1f));
+            consoleInput.Select();
+            consoleInput.ActivateInputField();
+        }
         
         private static void Send(string msg)
         {
@@ -143,11 +155,9 @@ namespace Console {
         {
             logTrans.sizeDelta = new Vector2(logTrans.sizeDelta.x, history.Count * consoleLog.font.faceInfo.lineHeight);
         }
-        private void OpenConsole(bool value) {
+        private void OpenConsole(bool value)
+        {
             consoleCanvas.gameObject.SetActive(true);
-            consoleInput.Select();
-            consoleInput.ActivateInputField();
-            consoleInput.text = "";
             mode = value ? ConsoleMode.OneTime : ConsoleMode.Execution;
             enabled = true;
         }
@@ -155,6 +165,7 @@ namespace Console {
         {
             consoleCanvas.gameObject.SetActive(false);
             enabled = false;
+            consoleInput.text = "";
         }
         private void Compact(bool value)
         {

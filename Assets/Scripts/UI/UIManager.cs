@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-[ExecuteAlways]
-public class UIManager : MonoBehaviour
+namespace UI
 {
-    public GridLayoutGroup hp_bar;
+    [ExecuteAlways]
+    public class UIManager : MonoBehaviour
+    {
+        [FormerlySerializedAs("hp_bar")] public GridLayoutGroup hpBar;
 
-    private void Update() {
-        hp_bar.spacing = new Vector2(Screen.width-2*hp_bar.cellSize.x, hp_bar.spacing.y);
+        private void Update() {
+            hpBar.spacing = new Vector2(Screen.width-2*hpBar.cellSize.x, hpBar.spacing.y);
+        }
     }
 }

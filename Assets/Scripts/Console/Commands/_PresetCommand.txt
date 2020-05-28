@@ -12,7 +12,7 @@
             throw new System.NotImplementedException();
         }
 
-        public QuitCommand()
+        public PresetCommand()
         {
             name = "PresetCommand";
             command = "preset";
@@ -20,7 +20,7 @@
             help = "preset";
             
             // Integrate
-            GlobalConsole.instance.AddCommand(name, this);
+            GlobalConsole.instance.AddCommand(command, this);
         }
     }
 }
