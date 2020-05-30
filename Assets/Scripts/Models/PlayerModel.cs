@@ -1,4 +1,4 @@
-﻿using Management;
+using Management;
 
 namespace Models
 {
@@ -37,5 +37,6 @@ namespace Models
             _health = health;
             _energy = energy;
         }
+        
     }
 }
