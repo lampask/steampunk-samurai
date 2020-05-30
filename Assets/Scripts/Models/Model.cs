@@ -1,6 +1,6 @@
 ﻿namespace Models
 {
-    public class ArenaModel : Model
+    public class Model
     {
         
     }
