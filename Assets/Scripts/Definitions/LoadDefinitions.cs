@@ -20,12 +20,7 @@ namespace Definitions
             {
                 {0, new PlayerDefinition(0, 0, PlayerIndex.One)},
             };
-            arenas = new Dictionary<int, ArenaDefinition>
-            {
-                {0, new ArenaDefinition()},
-                {1, new ArenaDefinition()},
-                {2, new ArenaDefinition()}
-            };
+            arenas = new Dictionary<int, ArenaDefinition>();
         }
     }
 }

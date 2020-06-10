@@ -218,6 +218,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loadingScreen: {fileID: 544650588}
+  tex: {fileID: 2800000, guid: 2412b58081b63dd45b073f2f3f17fcb8, type: 3}
   totalLoadingProgress: 0
 --- !u!4 &178884907
 Transform:
