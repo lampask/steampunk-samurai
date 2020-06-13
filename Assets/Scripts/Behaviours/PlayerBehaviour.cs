@@ -1,4 +1,7 @@
-﻿using Management;
+﻿using Definitions;
+using Management;
+using Models;
+using UI;
 using UnityEngine;
 using XInputDotNetPure;
 
@@ -20,8 +23,11 @@ namespace Behaviours
         [Header("Layers")]
         public LayerMask groundLayer;
 
+        public PlayerModel model;
+        public PlayerDefinition definition;
+        public Bar healtBar;
+        
         [Space]
-
         public bool onGround;
         public bool onWall;
         public bool onRightWall;
@@ -49,11 +55,11 @@ namespace Behaviours
         private GamePadState prevState;
         private Rigidbody2D rb;
         public float a; 
-
         
         
         // Use this for initialization
-        private void Awake() {
+        private void Awake()
+        {
             rb = GetComponent<Rigidbody2D>();
             playerIndex = LocalGameManager.definitions.players[id].controls;
         }

@@ -24,7 +24,7 @@ namespace Management
             if (onPlayerHealthChangeEvent != null) onPlayerHealthChangeEvent = new PlayerEvent();
             if (onPlayerEnergyChangeEvent != null) onPlayerEnergyChangeEvent = new PlayerEvent();
         }
-
+        
         void Start()
         {
             LoadModels();

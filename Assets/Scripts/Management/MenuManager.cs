@@ -84,6 +84,7 @@ namespace Management
 
         // Menu Events
         public void Play() {
+            
             GlobalGameManager.instance.LoadGame();
         }
 

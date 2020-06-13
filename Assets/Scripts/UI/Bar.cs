@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Management;
+using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Utilities;
@@ -18,8 +19,7 @@ namespace UI
         public Color barFillColor = new Color(1,1,1);
         [FormerlySerializedAs("default_bar_height")] public float defaultBarHeight = 20f;
         [FormerlySerializedAs("default_bar_width")] public float defaultBarWidth = 200f;
-        [Utils.ReadOnly] public bool inverted
-        ;
+        [Utils.ReadOnly] public bool inverted;
         [Space]
         [Tooltip("The bar fill percentage")]
         [Range(0, 100)]

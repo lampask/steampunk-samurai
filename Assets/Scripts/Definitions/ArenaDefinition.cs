@@ -5,6 +5,7 @@ namespace Definitions
 {
     public class ArenaDefinition
     {
+        // number of players -> spawn point locations
         public Dictionary<int, List<SpawnPoint>> spawnLocations { get; private set; }
         public List<Building> buildings { get; private set; }
         public List<Zone> zones { get; private set; }
