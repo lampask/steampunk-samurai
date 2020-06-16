@@ -1,4 +1,5 @@
 using Management;
+using Gameplay.Input;
 
 namespace Models
 {
@@ -29,13 +30,14 @@ namespace Models
             }
         }
         
+        public Control control { get; private set; } 
         
-        
-        public PlayerModel(int id, int health, int energy)
+        public PlayerModel(int id, int health, int energy, Control control)
         {
             this.id = id;
             _health = health;
             _energy = energy;
+            this.control = control;
         }
         
     }

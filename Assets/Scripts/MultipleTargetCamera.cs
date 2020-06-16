@@ -1,9 +1,4 @@
-﻿using Gameplay;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
-using UnityEditor.Experimental.GraphView;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]

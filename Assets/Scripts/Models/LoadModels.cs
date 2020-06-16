@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using Gameplay.Input;
+using Management;
+using SharpDX.XInput;
 
 namespace Models
 {
@@ -17,7 +20,7 @@ namespace Models
         {
             players = new Dictionary<int, PlayerModel>()
             {
-                {0, new PlayerModel(0, 100, 50)}
+                {0, new PlayerModel(0, 100, 50, GlobalGameManager.instance.controls[new Unid((UserIndex) 1)])}
             };
             arenas = new Dictionary<int, ArenaModel>
             {

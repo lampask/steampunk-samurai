@@ -1,4 +1,5 @@
 ﻿using System;
+using Definitions;
 using UnityEngine;
 
 namespace Gameplay
@@ -10,7 +11,7 @@ namespace Gameplay
         
         protected GameObject obj { get; private set; }
 
-        public abstract void OnPickup(Player target);
+        public abstract void OnPickup(PlayerDefinition target);
 
         protected virtual void Awake()
         {
@@ -20,7 +21,7 @@ namespace Gameplay
 
         protected void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.TryGetComponent(out Player p))
+            if (other.TryGetComponent(out PlayerDefinition p))
             {
                 OnPickup(p);
             }

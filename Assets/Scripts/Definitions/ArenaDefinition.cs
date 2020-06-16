@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Environment;
+using GameEnvironment;
 
 namespace Definitions
 {

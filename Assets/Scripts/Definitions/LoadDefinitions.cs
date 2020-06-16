@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
-using XInputDotNetPure;
+using System.Linq;
+using Gameplay.Input;
+using Management;
+using SharpDX.XInput;
 
 namespace Definitions
 {
@@ -18,7 +21,7 @@ namespace Definitions
         {
             players = new Dictionary<int, PlayerDefinition>
             {
-                {0, new PlayerDefinition(0, 0, PlayerIndex.One)},
+                {0, new PlayerDefinition(0, 0, GlobalGameManager.instance.controls[new Unid(UserIndex.One)])},
             };
             arenas = new Dictionary<int, ArenaDefinition>();
         }

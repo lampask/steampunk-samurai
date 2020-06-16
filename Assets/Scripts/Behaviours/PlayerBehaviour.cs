@@ -1,9 +1,7 @@
-﻿using Definitions;
-using Management;
+﻿using Management;
 using Models;
 using UI;
 using UnityEngine;
-using XInputDotNetPure;
 
 namespace Behaviours
 {
@@ -22,9 +20,8 @@ namespace Behaviours
         
         [Header("Layers")]
         public LayerMask groundLayer;
+        private PlayerModel model;
 
-        public PlayerModel model;
-        public PlayerDefinition definition;
         public Bar healtBar;
         
         [Space]
@@ -50,9 +47,6 @@ namespace Behaviours
         public float movementFactor = 0.2f;
         
         private bool playerIndexSet;
-        private PlayerIndex playerIndex;
-        private GamePadState state;
-        private GamePadState prevState;
         private Rigidbody2D rb;
         public float a; 
         
@@ -61,21 +55,21 @@ namespace Behaviours
         private void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
-            playerIndex = LocalGameManager.definitions.players[id].controls;
+            //playerIndex = LocalGameManager.definitions.players[id].controls;
         }
 
         private void FixedUpdate()
         {
             // vibration testing
-            GamePad.SetVibration(playerIndex, state.Triggers.Left, state.Triggers.Right);
+            //GamePad.SetVibration(playerIndex, state.Triggers.Left, state.Triggers.Right);
         }
         
         private void Update()
         {
             
-            prevState = state;
-            state = GamePad.GetState(playerIndex);
-
+            //prevState = state;
+            //state = GamePad.GetState(playerIndex);
+            /*
             Move(new Vector2(state.ThumbSticks.Left.X, state.ThumbSticks.Left.Y));
             
             if (prevState.Buttons.A == ButtonState.Released && state.Buttons.A == ButtonState.Pressed)
@@ -85,7 +79,7 @@ namespace Behaviours
 
             if(rb.velocity.y < 0) rb.velocity += Vector2.up * (Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime);
             else if(rb.velocity.y > 0 && state.Buttons.A != ButtonState.Pressed) rb.velocity += Vector2.up * (Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime);
-            
+            */
             var position = transform.position;
             onGround = Physics2D.OverlapCircle((Vector2)position + bottomOffset, collisionRadius, groundLayer);
             onWall = Physics2D.OverlapCircle((Vector2)position + rightOffset, collisionRadius, groundLayer) 

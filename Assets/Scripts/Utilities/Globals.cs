@@ -6,6 +6,7 @@ namespace Utilities
 {
     public static class Globals
     {
+        public static string settingPath;
         public enum GamepadType
         {
             Xbox,

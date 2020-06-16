@@ -1,4 +1,4 @@
-﻿using XInputDotNetPure;
+﻿using Gameplay.Input;
 
 namespace Definitions
 {
@@ -6,9 +6,9 @@ namespace Definitions
     {
         public int id { get; private set; }
         public int color { get; private set; }
-        public PlayerIndex controls { get; private set; }
+        public Control controls { get; private set; }
         
-        public PlayerDefinition(int id, int color, PlayerIndex controls)
+        public PlayerDefinition(int id, int color, Control controls)
         {
             this.id = id;
             this.color = color;

@@ -5,9 +5,12 @@ using Console;
 using SharpDX.XInput;
 using SharpDX.DirectInput;
 using Console.Commands;
+using dotenv.net;
 using Gameplay.Input;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Discord;
+using Utilities;
 
 namespace Management
 {
@@ -16,9 +19,15 @@ namespace Management
         public static GlobalGameManager instance;
         public GameObject loadingScreen;
         public static DirectInput dInput;
+        public static ActivityManager activityManager;
+        public Activity activity;
+        public Discord.Discord discord;
         public Dictionary<Unid, Control> controls;
+        public long startTimestamp;
         public bool inputOverlay { get; set; }
-        
+
+        private Settings settingInstance;
+
         // Preserve game state 
         [SerializeField] private List<ICommand> gameCommands;
     
@@ -33,12 +42,68 @@ namespace Management
                 instance = this;
             else
                 Destroy(this);
-        
-            gameCommands = new List<ICommand>();
+            
+            // Load configs & settings
+            DotEnv.Config();
+            Globals.settingPath = Application.persistentDataPath + "/settings.samurai";
+            startTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             inputOverlay = true;
+            Cursor.visible = false;
+
+            // Initialize base classes
+            gameCommands = new List<ICommand>();
+
+
+            // Setup activity
+            activity = new Activity
+            {
+                State = "Currently not in game",
+                Details = "Browsing menu",
+                Timestamps = new ActivityTimestamps()
+                {
+                    Start = startTimestamp
+                },
+                Assets = new ActivityAssets()
+                {
+                    LargeImage = "shield"
+                }
+            };
+            
+            // Initialize DirectInput
+            dInput = new DirectInput();
+            controls = new Dictionary<Unid, Control>();
             
             // Load Menu 
             SceneManager.LoadSceneAsync((int) SceneIndexes.MenuScreen, LoadSceneMode.Additive);
+        }
+
+        private void SetupDiscord(bool silent)
+        {
+            try
+            {
+                discord = new Discord.Discord(long.Parse(Environment.GetEnvironmentVariable("CLIENT_ID") ?? throw new Exception("Value could not be retrieved.")), 
+                    (ulong) CreateFlags.NoRequireDiscord);
+                activityManager = discord.GetActivityManager();
+                
+                activityManager.UpdateActivity(activity, (res) =>
+                {
+                    if (res == Result.Ok)
+                    {
+                        Debug.Log("Discord activity successfully updated");
+                    }
+                });
+                discord.SetLogHook(LogLevel.Debug, LogProblemsFunction);
+                GlobalConsole.Log("Discord SDK successfully loaded");
+            }
+            catch (ResultException e)
+            {
+                if (!silent) GlobalConsole.Error($"Discord SDK couldn't be loaded\n {e}");
+            }
+        }
+        
+        public void LogProblemsFunction(LogLevel level, string message)
+        { 
+            GlobalConsole.Log($"Discord:{level} - {message}");
         }
 
         private void Start()
@@ -47,9 +112,9 @@ namespace Management
             gameCommands.Add(new QuitCommand());
             gameCommands.Add(new InputDebugCommand());
             
-            // Initialize DirectInput
-            dInput = new DirectInput();
-            controls = new Dictionary<Unid, Control>();
+            // Late Initialize (needs preload)
+            settingInstance = new Settings();
+            SetupDiscord(false);
         }
 
         private void Update()
@@ -114,6 +179,18 @@ namespace Management
             }
             foreach (var control in delList) { controls.Remove(control); }
             
+            if (discord == null) SetupDiscord(true);
+            else
+                try
+                {
+                    discord.RunCallbacks();
+                }
+                catch (ResultException _)
+                {
+                    discord.Dispose();
+                    discord = null;
+                    GlobalConsole.Log("Discord SDK disconnected");
+                }
         }
 
         private void OnGUI()
