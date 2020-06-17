@@ -1,16 +1,41 @@
 ﻿using System;
+using Console;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Utilities;
 
 namespace Management
 {
     public class MenuManager : MonoBehaviour
     {
         public static MenuManager instance;
-        private Button previousButton;
+        public GameObject container;
         [SerializeField] private float scaleAmount = 1.4f;
+        private Button previousButton;
         public GameObject defaultButton;
+        private bool characterMode;
+        
+        [Serializable]
+        public class MenuPart
+        {
+            [Utils.ReadOnly] public string name;
+            public GameObject obj;
+
+            public MenuPart(string name)
+            {
+                this.name = name;
+            }
+        }
+
+        public MenuPart[] menuComponents =
+        {
+            new MenuPart("Logo"),
+            new MenuPart("Mask1"),
+            new MenuPart("Mask2"),
+            new MenuPart("Mask3"),
+            new MenuPart("Mask4"),
+        };
         
         [Serializable]
         public class Binding {
@@ -49,28 +74,36 @@ namespace Management
         // This is the worst thing I coded in my entire life >.<  please don't judge me I have brain damage
         private void Update()
         {
-            if (defaultButton)
+            if (!EventSystem.current.alreadySelecting && EventSystem.current.currentSelectedGameObject == null)
             {
-                var selectedObj = EventSystem.current.currentSelectedGameObject;
-                var selectedAsButton = selectedObj.GetComponent<Button>();
-                if (selectedAsButton.Equals(null))
+                if (previousButton)
                 {
-                    if (selectedObj.Equals(null))
-                    {
-                        EventSystem.current.SetSelectedGameObject(previousButton.gameObject);
-                        previousButton = null;
-                    }
-                    return;
+                    EventSystem.current.SetSelectedGameObject(previousButton.gameObject);
+                    HighlightButton(previousButton);
                 }
+                else if (defaultButton)
+                {
+                    EventSystem.current.SetSelectedGameObject(defaultButton);
+                }
+            }
+            var selectedObj = EventSystem.current.currentSelectedGameObject;
+            if (selectedObj.TryGetComponent(typeof(Button), out var selectedAsButton))
+            {
                 if (selectedAsButton != previousButton)
                 {
-                    HighlightButton(selectedAsButton);
+                    HighlightButton((Button) selectedAsButton);
                 }
+
                 if (previousButton && previousButton != selectedAsButton)
                 {
                     UnHighlightButton(previousButton);
                 }
-                previousButton = selectedAsButton;
+
+                previousButton = (Button) selectedAsButton;
+            }
+            else
+            {
+                UnHighlightButton(previousButton);
             }
         }
 
@@ -85,9 +118,25 @@ namespace Management
         }
 
         // Menu Events
-        public void Play() {
+        public void Play()
+        {
+            LeanTween.moveY(container, container.transform.position.y < 0 ? 5 : -5 , 1f).setEaseInOutQuart();
+            //GlobalGameManager.instance.LoadGame();
+        }
+
+        public void Settings()
+        {
             
-            GlobalGameManager.instance.LoadGame();
+        }
+
+        public void Quit()
+        {
+            GlobalConsole.commands["quit"].OnCommand(new []{"quit"});
+        }
+
+        public void Volume()
+        {
+            Management.Settings.instance.volume = !Management.Settings.instance.volume;
         }
 
         public void Default() {

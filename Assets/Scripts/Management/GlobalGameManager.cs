@@ -20,7 +20,7 @@ namespace Management
         public GameObject loadingScreen;
         public static DirectInput dInput;
         public static ActivityManager activityManager;
-        public Activity activity;
+        public Dictionary<string, Activity> activities;
         public Discord.Discord discord;
         public Dictionary<Unid, Control> controls;
         public long startTimestamp;
@@ -54,9 +54,8 @@ namespace Management
             gameCommands = new List<ICommand>();
 
 
-            // Setup activity
-            activity = new Activity
-            {
+            // Setup activities
+            activities.Add("Menu", new Activity {
                 State = "Currently not in game",
                 Details = "Browsing menu",
                 Timestamps = new ActivityTimestamps()
@@ -67,7 +66,20 @@ namespace Management
                 {
                     LargeImage = "shield"
                 }
-            };
+            });
+            activities.Add("CHSelection", new Activity {
+                State = "Selecting characters",
+                Details = $"{1} / 4 are ready",
+                Timestamps = new ActivityTimestamps()
+                {
+                    Start = startTimestamp
+                },
+                Assets = new ActivityAssets()
+                {
+                    LargeImage = "shield"
+                }
+            });
+            
             
             // Initialize DirectInput
             dInput = new DirectInput();
@@ -85,7 +97,7 @@ namespace Management
                     (ulong) CreateFlags.NoRequireDiscord);
                 activityManager = discord.GetActivityManager();
                 
-                activityManager.UpdateActivity(activity, (res) =>
+                activityManager.UpdateActivity(activities["Menu"], (res) =>
                 {
                     if (res == Result.Ok)
                     {
@@ -167,7 +179,7 @@ namespace Management
             // Error checks
             foreach (var control in controls)
             {
-                if (!control.Value.isXInput)
+                if (control.Value.type != Control.ControlType.XInputController)
                 {
                     if (controls.ContainsKey(new Unid((UserIndex) Array.IndexOf(Input.GetJoystickNames(),
                         control.Value.name))))

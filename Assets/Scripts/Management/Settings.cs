@@ -26,6 +26,15 @@ namespace Management
             set { _fullscreen = value; SaveSettings(); }
         }
 
+        // Volume setting
+        private bool _volume = true;
+        public bool volume
+        {
+            get => _volume;
+            set { _volume = value; SaveSettings(); }
+        }
+
+            
         public Settings()
         {
             if (instance == null || instance.Equals(null)) instance = this;

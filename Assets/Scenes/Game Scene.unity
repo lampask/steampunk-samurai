@@ -971,25 +971,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a327a42d6ebce6049beffd9296954690, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  onGround: 0
-  onWall: 0
-  onRightWall: 0
-  onLeftWall: 0
-  wallSide: 0
-  collisionRadius: 0.25
-  bottomOffset: {x: 0, y: -0.59}
-  rightOffset: {x: 0.2, y: 0}
-  leftOffset: {x: -0.2, y: 0}
-  canMove: 1
-  jumpForce: 6
-  speed: 5
-  fallMultiplier: 3
-  lowJumpMultiplier: 2.5
-  movementFactor: 0.2
-  a: 0
 --- !u!1 &1205451508
 GameObject:
   m_ObjectHideFlags: 0
@@ -1001,7 +982,6 @@ GameObject:
   - component: {fileID: 1205451512}
   - component: {fileID: 1205451511}
   - component: {fileID: 1205451510}
-  - component: {fileID: 1205451509}
   m_Layer: 5
   m_Name: UI
   m_TagString: Untagged
@@ -1009,23 +989,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1205451509
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1205451508}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!114 &1205451510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1626,25 +1589,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a327a42d6ebce6049beffd9296954690, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  onGround: 0
-  onWall: 0
-  onRightWall: 0
-  onLeftWall: 0
-  wallSide: 0
-  collisionRadius: 0.25
-  bottomOffset: {x: 0, y: -0.59}
-  rightOffset: {x: 0.2, y: 0}
-  leftOffset: {x: -0.2, y: 0}
-  canMove: 1
-  jumpForce: 6
-  speed: 5
-  fallMultiplier: 3
-  lowJumpMultiplier: 2.5
-  movementFactor: 0.2
-  a: 0
 --- !u!70 &2133294456
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

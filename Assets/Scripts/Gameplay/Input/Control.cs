@@ -9,21 +9,27 @@ namespace Gameplay.Input
 {
     public class Control
     {
-        public bool isXInput { get; private set; }
+        public enum ControlType
+        {
+            XInputController,
+            DInputController,
+            Keyboard
+        }
+        public ControlType type { get; private set; }
         public Controller xControl { get; private set; }
         public Joystick dControl { get; private set; }
 
-        public Globals.GamepadType type;
+        public Globals.GamepadType debugType;
 
         public Control(Controller xControl)
         {
-            isXInput = true;
+            type = ControlType.XInputController;
             this.xControl = xControl;
         }
 
         public Control(Joystick dControl)
         {
-            isXInput = false;
+            type = ControlType.DInputController;
             this.dControl = dControl;
         }
         
@@ -31,7 +37,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     return UnityEngine.Input.GetJoystickNames()[(int) xControl.UserIndex];
                 }
@@ -46,7 +52,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     return xControl.IsConnected;
                 }
@@ -80,7 +86,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return new Vector2(state.Gamepad.RightThumbX / 1000f, y: state.Gamepad.RightThumbY / 1000f);
@@ -97,7 +103,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return (((int)state.Gamepad.Buttons >> 7) & 1) == 1;
@@ -113,7 +119,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return new Vector2(state.Gamepad.LeftThumbX / 1000f, y: state.Gamepad.LeftThumbY / 1000f);
@@ -130,7 +136,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return (((int)state.Gamepad.Buttons >> 6) & 1) == 1;
@@ -146,7 +152,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return state.Gamepad.RightTrigger;
@@ -165,7 +171,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return state.Gamepad.LeftTrigger;
@@ -185,7 +191,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return new DPad((((int) state.Gamepad.Buttons >> 0) & 1) == 1,
@@ -209,7 +215,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return (((int) state.Gamepad.Buttons >> 8) & 1) == 1;
@@ -226,7 +232,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return (((int) state.Gamepad.Buttons >> 9) & 1) == 1;
@@ -243,7 +249,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return (((int) state.Gamepad.Buttons >> 5) & 1) == 1;
@@ -260,7 +266,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return (((int) state.Gamepad.Buttons >> 4) & 1) == 1;
@@ -277,7 +283,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return (((int)state.Gamepad.Buttons >> 8) & 14) == 1;
@@ -294,7 +300,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return (((int)state.Gamepad.Buttons >> 15) & 1) == 1;
@@ -311,7 +317,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return (((int)state.Gamepad.Buttons >> 13) & 1) == 1;
@@ -328,7 +334,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                 {
                     var state = xControl.GetState();
                     return (((int)state.Gamepad.Buttons >> 12) & 1) == 1;
@@ -345,7 +351,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                     return false;
                 else
                 {
@@ -359,7 +365,7 @@ namespace Gameplay.Input
         {
             get
             {
-                if (isXInput)
+                if (type == ControlType.XInputController)
                     return false;
                 else
                 {
@@ -373,7 +379,7 @@ namespace Gameplay.Input
 
         public void DrawControl(float x, float y, float scaleFactor)
         {
-            GUI.DrawTexture(new Rect(x, y,225*scaleFactor, 104*scaleFactor), Imports.Gamepad[type]["gamepad"], ScaleMode.ScaleToFit);
+            GUI.DrawTexture(new Rect(x, y,225*scaleFactor, 104*scaleFactor), Imports.Gamepad[debugType]["gamepad"], ScaleMode.ScaleToFit);
                  
             // Determine font size and styles
             var styles = new GUIStyle();
@@ -387,51 +393,51 @@ namespace Gameplay.Input
             Rect SetupBounds(Rect relativeBounds) { return new Rect(new Vector2(x, y) + relativeBounds.position * scaleFactor, relativeBounds.size * scaleFactor); }
 
             // Handle trigger change
-            if (Math.Abs(leftTrigger) > 1f) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].lTrigger), Imports.Gamepad[type]["LTrigger"], ScaleMode.ScaleToFit); 
+            if (Math.Abs(leftTrigger) > 1f) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].lTrigger), Imports.Gamepad[debugType]["LTrigger"], ScaleMode.ScaleToFit); 
             GUI.Label(new Rect(x+11.5f*scaleFactor, y+22.5f*scaleFactor, 42*scaleFactor, 20*scaleFactor), $"{Math.Round(leftTrigger, 4)}", styles);
-            if (Math.Abs(rightTrigger) > 1f) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].rTrigger), Imports.Gamepad[type]["RTrigger"], ScaleMode.ScaleToFit); 
+            if (Math.Abs(rightTrigger) > 1f) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].rTrigger), Imports.Gamepad[debugType]["RTrigger"], ScaleMode.ScaleToFit); 
             GUI.Label(new Rect(x+193*scaleFactor, y+22.5f*scaleFactor, 42*scaleFactor, 20*scaleFactor), $"{Math.Round(rightTrigger, 4)}", styles); 
             
             // Handle buttons
-            if (leftShoulder) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].lShoulder), Imports.Gamepad[type]["LShoulder"], ScaleMode.ScaleToFit); 
-            if (rightShoulder) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].rShoulder), Imports.Gamepad[type]["RShoulder"], ScaleMode.ScaleToFit); 
-            if (back) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].back), Imports.Gamepad[type]["Back"], ScaleMode.ScaleToFit); 
-            if (start) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].start), Imports.Gamepad[type]["Start"], ScaleMode.ScaleToFit); 
-            if (this.x) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].x), Imports.Gamepad[type]["X"], ScaleMode.ScaleToFit); 
-            if (this.y) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].y), Imports.Gamepad[type]["Y"], ScaleMode.ScaleToFit); 
-            if (b) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].b), Imports.Gamepad[type]["B"], ScaleMode.ScaleToFit); 
-            if (a) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].a), Imports.Gamepad[type]["A"], ScaleMode.ScaleToFit); 
-            if (guide) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].guide), Imports.Gamepad[type]["Guide"], ScaleMode.ScaleToFit);
+            if (leftShoulder) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].lShoulder), Imports.Gamepad[debugType]["LShoulder"], ScaleMode.ScaleToFit); 
+            if (rightShoulder) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].rShoulder), Imports.Gamepad[debugType]["RShoulder"], ScaleMode.ScaleToFit); 
+            if (back) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].back), Imports.Gamepad[debugType]["Back"], ScaleMode.ScaleToFit); 
+            if (start) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].start), Imports.Gamepad[debugType]["Start"], ScaleMode.ScaleToFit); 
+            if (this.x) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].x), Imports.Gamepad[debugType]["X"], ScaleMode.ScaleToFit); 
+            if (this.y) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].y), Imports.Gamepad[debugType]["Y"], ScaleMode.ScaleToFit); 
+            if (b) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].b), Imports.Gamepad[debugType]["B"], ScaleMode.ScaleToFit); 
+            if (a) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].a), Imports.Gamepad[debugType]["A"], ScaleMode.ScaleToFit); 
+            if (guide) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].guide), Imports.Gamepad[debugType]["Guide"], ScaleMode.ScaleToFit);
             if (display) { /* Not implemented */ }
             
             // Handle stick change
             if (Math.Abs(leftStick.x) > 2f || Math.Abs(leftStick.y) > 2f || leftStickButton)
             {
-                GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].lStick), Imports.Gamepad[type]["LStick"], ScaleMode.ScaleToFit);
-                var product = Globals.GamepadProps[type].lStickCenter + stickRadius * new Vector2(leftStick.x, -leftStick.y).normalized;
+                GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].lStick), Imports.Gamepad[debugType]["LStick"], ScaleMode.ScaleToFit);
+                var product = Globals.GamepadProps[debugType].lStickCenter + stickRadius * new Vector2(leftStick.x, -leftStick.y).normalized;
                 GUI.DrawTexture(new Rect(x+product.x*scaleFactor,y+product.y*scaleFactor, 3.5f*scaleFactor, 3.5f*scaleFactor), Imports.Gamepad[Globals.GamepadType.Generic]["Pointer"], ScaleMode.ScaleToFit);
             }
             GUI.Label(new Rect(x+11.5f*scaleFactor, y+48*scaleFactor, 42*scaleFactor, 20*scaleFactor), $"{Math.Round(leftStick.x, 4)}\n{Math.Round(leftStick.y, 4)}", styles);
             
             if (Math.Abs(rightStick.x) > 2f || Math.Abs(rightStick.y) > 2f || rightStickButton)
             {
-                GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].rStick), Imports.Gamepad[type]["RStick"], ScaleMode.ScaleToFit);
-                var product = Globals.GamepadProps[type].rStickCenter + stickRadius * new Vector2(rightStick.x, -rightStick.y).normalized;
+                GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].rStick), Imports.Gamepad[debugType]["RStick"], ScaleMode.ScaleToFit);
+                var product = Globals.GamepadProps[debugType].rStickCenter + stickRadius * new Vector2(rightStick.x, -rightStick.y).normalized;
                 GUI.DrawTexture(new Rect(x+product.x*scaleFactor,y+product.y*scaleFactor, 3.5f*scaleFactor, 3.5f*scaleFactor), Imports.Gamepad[Globals.GamepadType.Generic]["Pointer"], ScaleMode.ScaleToFit);
             }
             GUI.Label(new Rect(x+193*scaleFactor, y+66*scaleFactor, 42*scaleFactor, 20*scaleFactor), $"{Math.Round(rightStick.x, 4)}\n{Math.Round(rightStick.y, 4)}", styles);
 
             // Handle dPad change
-            if (!Globals.GamepadProps[type].compositeDPad) {
-                if (dPad.any) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].dPad), Imports.Gamepad[type]["DPad"], ScaleMode.ScaleToFit);
+            if (!Globals.GamepadProps[debugType].compositeDPad) {
+                if (dPad.any) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].dPad), Imports.Gamepad[debugType]["DPad"], ScaleMode.ScaleToFit);
             }
-            if (dPad.up) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].up), Globals.GamepadProps[type].compositeDPad ? Imports.Gamepad[type]["DPadUp"] : Imports.Gamepad[Globals.GamepadType.Generic]["Pointer"], ScaleMode.ScaleToFit);
-            if (dPad.down) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].down), Globals.GamepadProps[type].compositeDPad ? Imports.Gamepad[type]["DPadDown"] : Imports.Gamepad[Globals.GamepadType.Generic]["Pointer"], ScaleMode.ScaleToFit);
-            if (dPad.left) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].left), Globals.GamepadProps[type].compositeDPad ? Imports.Gamepad[type]["DPadLeft"] : Imports.Gamepad[Globals.GamepadType.Generic]["Pointer"], ScaleMode.ScaleToFit);
-            if (dPad.right) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[type].right), Globals.GamepadProps[type].compositeDPad ? Imports.Gamepad[type]["DPadRight"] : Imports.Gamepad[Globals.GamepadType.Generic]["Pointer"], ScaleMode.ScaleToFit);
+            if (dPad.up) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].up), Globals.GamepadProps[debugType].compositeDPad ? Imports.Gamepad[debugType]["DPadUp"] : Imports.Gamepad[Globals.GamepadType.Generic]["Pointer"], ScaleMode.ScaleToFit);
+            if (dPad.down) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].down), Globals.GamepadProps[debugType].compositeDPad ? Imports.Gamepad[debugType]["DPadDown"] : Imports.Gamepad[Globals.GamepadType.Generic]["Pointer"], ScaleMode.ScaleToFit);
+            if (dPad.left) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].left), Globals.GamepadProps[debugType].compositeDPad ? Imports.Gamepad[debugType]["DPadLeft"] : Imports.Gamepad[Globals.GamepadType.Generic]["Pointer"], ScaleMode.ScaleToFit);
+            if (dPad.right) GUI.DrawTexture(SetupBounds(Globals.GamepadProps[debugType].right), Globals.GamepadProps[debugType].compositeDPad ? Imports.Gamepad[debugType]["DPadRight"] : Imports.Gamepad[Globals.GamepadType.Generic]["Pointer"], ScaleMode.ScaleToFit);
             GUI.Label(new Rect(x+11.5f*scaleFactor, y+78*scaleFactor, 42*scaleFactor, 20*scaleFactor), $"{(dPad.up ? 1 : 0)} {(dPad.down ? 1 : 0)} {(dPad.left ? 1 : 0)} {(dPad.right ? 1 : 0)}", styles);
             
-            GUI.Label(new Rect(x+5*scaleFactor, y+90*scaleFactor, 500*scaleFactor, 50*scaleFactor), $"{name}: {(attached ? "Connected" : "Disconnected")} \n Packet: {(isXInput ? xControl.GetState().PacketNumber.ToString() : "Not Supported")}");
+            GUI.Label(new Rect(x+5*scaleFactor, y+90*scaleFactor, 500*scaleFactor, 50*scaleFactor), $"{name}: {(attached ? "Connected" : "Disconnected")} \n Packet: {(type == ControlType.XInputController ? xControl.GetState().PacketNumber.ToString() : "Not Supported")}");
         }
     }
 }
