@@ -64,5 +64,13 @@ namespace Utilities
             )},
         };
         
+        public static readonly Color[] Colors = new[]
+        {
+            Color.green,
+            Color.blue, 
+            Color.yellow, 
+            Color.red
+        };
+        
     }
 }

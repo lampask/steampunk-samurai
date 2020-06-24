@@ -13,7 +13,8 @@ namespace Gameplay.Input
         {
             XInputController,
             DInputController,
-            Keyboard
+            Keyboard,
+            Undefined
         }
         public ControlType type { get; private set; }
         public Controller xControl { get; private set; }
@@ -32,6 +33,11 @@ namespace Gameplay.Input
             type = ControlType.DInputController;
             this.dControl = dControl;
         }
+
+        public Control()
+        {
+            type = ControlType.Keyboard;
+        }
         
         public string name
         {
@@ -41,9 +47,17 @@ namespace Gameplay.Input
                 {
                     return UnityEngine.Input.GetJoystickNames()[(int) xControl.UserIndex];
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     return dControl.Information.InstanceName;
+                }
+                else if (type == ControlType.Keyboard)
+                {
+                    return "Keyboard";
+                }
+                else
+                {
+                    return "???";
                 }
             }
         }
@@ -56,9 +70,13 @@ namespace Gameplay.Input
                 {
                     return xControl.IsConnected;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     return GlobalGameManager.dInput.IsDeviceAttached(dControl.Information.InstanceGuid);
+                }
+                else
+                {
+                    return true;
                 }
             }
         }
@@ -91,14 +109,17 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return new Vector2(state.Gamepad.RightThumbX / 1000f, y: state.Gamepad.RightThumbY / 1000f);
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return new Vector2(x: (state.Z-32767)/1000f, y: -(state.RotationZ-32767)/1000f);
                 }
+                else
+                {
+                    return new Vector2(UnityEngine.Input.GetAxis("Horizontal"), UnityEngine.Input.GetAxis("Vertical"));
+                }
             }
         }
-
         public bool rightStickButton
         {
             get
@@ -108,10 +129,14 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return (((int)state.Gamepad.Buttons >> 7) & 1) == 1;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return state.Buttons[11];
+                }
+                else
+                {
+                    return false;
                 }
             }
         }
@@ -124,14 +149,17 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return new Vector2(state.Gamepad.LeftThumbX / 1000f, y: state.Gamepad.LeftThumbY / 1000f);
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return new Vector2(x: (state.X-32767)/1000f, y: -(state.Y-32767)/1000f);
                 }
+                else
+                {
+                    return new Vector2(UnityEngine.Input.GetAxis("Horizontal"), UnityEngine.Input.GetAxis("Vertical"));
+                }
             }
         }
-
         public bool leftStickButton
         {
             get
@@ -141,10 +169,14 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return (((int)state.Gamepad.Buttons >> 6) & 1) == 1;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return state.Buttons[10];
+                }
+                else
+                {
+                    return false;
                 }
             }
         }
@@ -157,13 +189,17 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return state.Gamepad.RightTrigger;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     var trigger = (float) state.RotationY;
                     if (Math.Abs(trigger) < 0.02f)
                         trigger = (state.Buttons[7]) ? 100f : 0f;
                     return trigger;
+                }
+                else
+                {
+                    return 0f;
                 }
             }
         }
@@ -176,7 +212,7 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return state.Gamepad.LeftTrigger;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     var trigger = (float) state.RotationX;
@@ -184,9 +220,12 @@ namespace Gameplay.Input
                         trigger = (state.Buttons[6]) ? 100f : 0f;
                     return trigger;
                 }
+                else
+                {
+                    return 0f;
+                }
             }
         }
-
         public DPad dPad
         {
             get
@@ -199,7 +238,7 @@ namespace Gameplay.Input
                                     (((int) state.Gamepad.Buttons >> 2) & 1) == 1,
                                     (((int) state.Gamepad.Buttons >> 3) & 1) == 1);
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     var p = state.PointOfViewControllers[0];
@@ -208,9 +247,15 @@ namespace Gameplay.Input
                                     p == 27000 || p == 31500 || p == 22500,
                                     p == 9000 || p == 13500 || p == 4500);
                 }
+                else
+                {
+                    return new DPad(UnityEngine.Input.GetAxis("Vertical") > 0,
+                                    UnityEngine.Input.GetAxis("Vertical") < 0,
+                                    UnityEngine.Input.GetAxis("Horizontal") > 0,
+                                    UnityEngine.Input.GetAxis("Horizontal") < 0);
+                }
             }
         }
-
         public bool leftShoulder
         {
             get
@@ -220,14 +265,17 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return (((int) state.Gamepad.Buttons >> 8) & 1) == 1;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return state.Buttons[4];
                 }
+                else
+                {
+                    return false;
+                }
             }
         }
-
         public bool rightShoulder
         {
             get
@@ -237,14 +285,17 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return (((int) state.Gamepad.Buttons >> 9) & 1) == 1;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return state.Buttons[5];
                 }
+                else
+                {
+                    return false;
+                }
             }
         }
-
         public bool back
         {
             get
@@ -254,14 +305,17 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return (((int) state.Gamepad.Buttons >> 5) & 1) == 1;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return state.Buttons[8];
                 }
+                else
+                {
+                    return false;
+                }
             }
         }
-
         public bool start
         {
             get
@@ -271,14 +325,17 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return (((int) state.Gamepad.Buttons >> 4) & 1) == 1;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return state.Buttons[9];
                 }
+                else
+                {
+                    return false;
+                }
             }
         }
-        
         public bool x
         {
             get
@@ -288,14 +345,17 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return (((int)state.Gamepad.Buttons >> 8) & 14) == 1;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return state.Buttons[0];
                 }
+                else
+                {
+                    return UnityEngine.Input.GetKey(KeyCode.Z);
+                }
             }
         }
-        
         public bool y
         {
             get
@@ -305,14 +365,17 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return (((int)state.Gamepad.Buttons >> 15) & 1) == 1;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return state.Buttons[3];
                 }
+                else
+                {
+                    return UnityEngine.Input.GetKey(KeyCode.X);
+                }
             }
         }
-        
         public bool a
         {
             get
@@ -322,14 +385,17 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return (((int)state.Gamepad.Buttons >> 13) & 1) == 1;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return state.Buttons[2];
                 }
+                else
+                {
+                    return UnityEngine.Input.GetKey(KeyCode.C);
+                }
             }
         }
-        
         public bool b
         {
             get
@@ -339,40 +405,133 @@ namespace Gameplay.Input
                     var state = xControl.GetState();
                     return (((int)state.Gamepad.Buttons >> 12) & 1) == 1;
                 }
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return state.Buttons[1];
                 }
+                else
+                {
+                    return UnityEngine.Input.GetKey(KeyCode.V);
+                }
             }
         }
-        
         public bool guide
         {
             get
             {
                 if (type == ControlType.XInputController)
                     return false;
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return state.Buttons[12];
                 }
+                else
+                {
+                    return false;
+                }
             }
         }
-        
         public bool display
         {
             get
             {
                 if (type == ControlType.XInputController)
                     return false;
-                else
+                else if (type == ControlType.DInputController)
                 {
                     var state = dControl.GetCurrentState();
                     return state.Buttons[13];
                 }
+                else
+                {
+                    return false;
+                }
             }
+        }
+        
+        // Frame handling
+
+        // Not proud of this
+        public class ControlSnapshot
+        {
+            public Vector2 rightStick;
+            public bool rightStickButton;
+            public Vector2 leftStick;
+            public bool leftStickButton;
+            public float rightTrigger;
+            public float leftTrigger;
+            public DPad dPad;
+            public bool leftShoulder;
+            public bool rightShoulder;
+            public bool back;
+            public bool start;
+            public bool x;
+            public bool y;
+            public bool a;
+            public bool b;
+            public bool guide;
+            public bool display;
+
+            public ControlSnapshot(
+                Vector2 rightStick,
+                bool rightStickButton,
+                Vector2 leftStick,
+                bool leftStickButton,
+                float rightTrigger,
+                float leftTrigger,
+                DPad dPad,
+                bool leftShoulder,
+                bool rightShoulder,
+                bool back,
+                bool start,
+                bool x,
+                bool y,
+                bool a,
+                bool b,
+                bool guide,
+                bool display)
+            {
+                this.rightStick = rightStick;
+                this.rightStickButton = rightStickButton;
+                this.leftStick = leftStick;
+                this.leftStickButton = leftStickButton;
+                this.rightTrigger = rightTrigger;
+                this.leftTrigger = leftTrigger;
+                this.dPad = dPad;
+                this.leftShoulder = leftShoulder;
+                this.rightShoulder = rightShoulder;
+                this.back = back;
+                this.start = start;
+                this.x = x;
+                this.y = y;
+                this.a = a;
+                this.b = b;
+                this.guide = guide;
+                this.display = display;
+            }
+        }
+
+        public ControlSnapshot GenerateFrameStateClone() { 
+            return new ControlSnapshot(
+                rightStick,
+                rightStickButton,
+                leftStick,
+                leftStickButton,
+                rightTrigger,
+                leftTrigger,
+                dPad,
+                leftShoulder,
+                rightShoulder,
+                back,
+                start,
+                x,
+                y,
+                a,
+                b,
+                guide,
+                display); 
         }
         
         /////// DRAW ////////

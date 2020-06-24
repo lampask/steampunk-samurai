@@ -8,7 +8,7 @@ namespace Management
 {
     public class Settings
     {
-        public static Settings instance = null;
+        public static Settings instance;
 
         // Game session setting
         private bool _shareGameSession = true; 
@@ -49,10 +49,8 @@ namespace Management
             }
         }
         
-        public static void LoadSettings() => instance = JsonUtility.FromJson<Settings>(File.ReadAllText(Globals.settingPath));
+        public static void LoadSettings() => JsonUtility.FromJsonOverwrite(File.ReadAllText(Globals.settingPath), instance);
         public static void SaveSettings() => File.WriteAllText(Globals.settingPath,  JsonUtility.ToJson(instance));
-        
-        
-        
+
     }
 }

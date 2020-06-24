@@ -7,6 +7,13 @@ namespace Utilities
     {
         public static readonly GameObject PlayerObject = Resources.Load("player") as GameObject;
         public static readonly GameObject BackgroundObject = Resources.Load("background") as GameObject;
+        public static readonly List<Sprite> Characters = new List<Sprite>()
+        {
+            Resources.Load<Sprite>("Characters/one"), 
+            Resources.Load<Sprite>("Characters/two"),
+            Resources.Load<Sprite>("Characters/three"),
+            Resources.Load<Sprite>("Characters/four")
+        };
         public static readonly Dictionary<string, GameObject> BuildingObjects = new Dictionary<string, GameObject>
         {
             {"building1", Resources.Load("Objects/building1") as GameObject}
@@ -93,5 +100,7 @@ namespace Utilities
                 {"Pointer", Resources.Load("Debug/Gamepad/Pointer") as Texture},
             }},
         };
+
+        public static readonly Sprite disabled;
     }
 }

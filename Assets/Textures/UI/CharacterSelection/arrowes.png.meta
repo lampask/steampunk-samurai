@@ -1,13 +1,13 @@
 fileFormatVersion: 2
-guid: 40d60b0a44246e94ebc801e2c5181de4
+guid: 21091fe556389374a8b23e49c91751e6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 649223268058989734
-    second: Button_0
+      213: 852627487591803617
+    second: arrowes_0
   - first:
-      213: -9000188618666376746
-    second: Button_1
+      213: 3517668519039483615
+    second: arrowes_1
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -48,15 +48,15 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 402, y: 485, z: 441, w: 417}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
-  spriteTessellationDetail: 0
+  spriteTessellationDetail: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -117,31 +117,48 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Button_0
+      name: arrowes_0
       rect:
         serializedVersion: 2
-        x: 204
-        y: 289
-        width: 1477
-        height: 566
+        x: 0
+        y: 0
+        width: 44
+        height: 44
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 197, y: 192, z: 193, w: 185}
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6a403906f11820900800000000000000
-      internalID: 649223268058989734
+      spriteID: 1eaa4abbe2425db00800000000000000
+      internalID: 852627487591803617
       vertices: []
       indices: 
       edges: []
       weights: []
-    outline:
-    - - {x: -765, y: -259}
-      - {x: -765, y: 331}
-      - {x: 726, y: 331}
-      - {x: 726, y: -259}
+    - serializedVersion: 2
+      name: arrowes_1
+      rect:
+        serializedVersion: 2
+        x: 397
+        y: 0
+        width: 40
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fde3ce271e441d030800000000000000
+      internalID: 3517668519039483615
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000

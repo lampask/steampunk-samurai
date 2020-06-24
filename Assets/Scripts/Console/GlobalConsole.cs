@@ -138,7 +138,7 @@ namespace Console {
         private static void Send(string msg)
         {
             consoleLog.text += msg;
-            Debug.Log($"[InGame Console] ==> {msg}");
+            //Debug.Log($"[InGame Console] ==> {msg}");
             history.Add(msg);
             AdjustLogToFont();
             scrollRect.verticalNormalizedPosition = 0f;

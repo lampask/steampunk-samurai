@@ -37,24 +37,50 @@ namespace Management
             Game = 2
         }
 
+        private void OnEnable()
+        {
+            Application.logMessageReceived += HandleLog;
+        }
+
+        private void OnDisable()
+        {
+            Application.logMessageReceived -= HandleLog;
+        }
+
+        void HandleLog(string logString, string stackTrace, LogType type)
+        {
+            switch (type)
+            {
+                case LogType.Error:
+                    GlobalConsole.Error($"{logString}\n {stackTrace}");
+                    break;
+                case LogType.Exception:
+                    GlobalConsole.Error($"{logString}\n {stackTrace}");
+                    break;
+                default:
+                    GlobalConsole.Log(logString);
+                    break;
+            }
+        }
+
         private void Awake() {
             if (!instance)
                 instance = this;
             else
                 Destroy(this);
             
-            // Load configs & settings
-            DotEnv.Config();
-            Globals.settingPath = Application.persistentDataPath + "/settings.samurai";
+            Globals.settingPath = Application.dataPath + "/settings.samurai";
             startTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             inputOverlay = true;
             Cursor.visible = false;
-
+            
+            
             // Initialize base classes
             gameCommands = new List<ICommand>();
-
-
+        
+        
             // Setup activities
+            activities = new Dictionary<string, Activity>();
             activities.Add("Menu", new Activity {
                 State = "Currently not in game",
                 Details = "Browsing menu",
@@ -84,6 +110,8 @@ namespace Management
             // Initialize DirectInput
             dInput = new DirectInput();
             controls = new Dictionary<Unid, Control>();
+            
+            controls.Add(new Unid("Keyboard"), new Control());
             
             // Load Menu 
             SceneManager.LoadSceneAsync((int) SceneIndexes.MenuScreen, LoadSceneMode.Additive);
@@ -120,6 +148,13 @@ namespace Management
 
         private void Start()
         {
+            // Load configs & settings
+            try
+            {
+                DotEnv.Config();
+            } catch (Exception e) {
+                GlobalConsole.Error($"Cannot load .env file \n {e}");
+            }
             // Initialise console system
             gameCommands.Add(new QuitCommand());
             gameCommands.Add(new InputDebugCommand());
@@ -197,7 +232,7 @@ namespace Management
                 {
                     discord.RunCallbacks();
                 }
-                catch (ResultException _)
+                catch (ResultException)
                 {
                     discord.Dispose();
                     discord = null;
