@@ -5,7 +5,6 @@ using Console;
 using SharpDX.XInput;
 using SharpDX.DirectInput;
 using Console.Commands;
-using dotenv.net;
 using Gameplay.Input;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -121,7 +120,7 @@ namespace Management
         {
             try
             {
-                discord = new Discord.Discord(long.Parse(Environment.GetEnvironmentVariable("CLIENT_ID") ?? throw new Exception("Value could not be retrieved.")), 
+                discord = new Discord.Discord(722501715622101176, 
                     (ulong) CreateFlags.NoRequireDiscord);
                 activityManager = discord.GetActivityManager();
                 
@@ -148,13 +147,6 @@ namespace Management
 
         private void Start()
         {
-            // Load configs & settings
-            try
-            {
-                DotEnv.Config();
-            } catch (Exception e) {
-                GlobalConsole.Error($"Cannot load .env file \n {e}");
-            }
             // Initialise console system
             gameCommands.Add(new QuitCommand());
             gameCommands.Add(new InputDebugCommand());
