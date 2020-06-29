@@ -12,7 +12,8 @@ namespace Utilities
             Resources.Load<Sprite>("Characters/one"), 
             Resources.Load<Sprite>("Characters/two"),
             Resources.Load<Sprite>("Characters/three"),
-            Resources.Load<Sprite>("Characters/four")
+            Resources.Load<Sprite>("Characters/four"),
+            Resources.Load<Sprite>("Characters/default")
         };
         public static readonly Dictionary<string, GameObject> BuildingObjects = new Dictionary<string, GameObject>
         {

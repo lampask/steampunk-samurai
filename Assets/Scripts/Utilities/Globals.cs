@@ -69,8 +69,11 @@ namespace Utilities
             Color.green,
             Color.blue, 
             Color.yellow, 
-            Color.red
+            Color.red,
+            Color.white, 
         };
+        
+        public static readonly Color DimColor = new Color(0.7f, 0.7f, 0.7f);
         
     }
 }

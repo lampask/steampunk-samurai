@@ -3,7 +3,9 @@ using System.Linq;
 using Console;
 using Discord;
 using Gameplay;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Utilities;
@@ -12,7 +14,8 @@ namespace Management
 {
     public class MenuManager : MonoBehaviour
     {
-        enum MenuStages
+        public class SelectionEvent : UnityEvent<int> { }
+        public enum MenuStages
         {
             Menu,
             CharacterSelection,
@@ -24,7 +27,11 @@ namespace Management
         public GameObject defaultButton;
         private bool characterMode;
         public bool[] charactersAvailable;
-        private MenuStages stage = MenuStages.Menu;
+        public bool[] colorsAvailable;
+        public SelectionEvent playerConfirmed;
+        public SelectionEvent playerUnconfirmed;
+        public int confirmed { get; private set; } 
+        public MenuStages stage { get; private set; } = MenuStages.Menu;
         
         [Serializable]
         public class MenuPart
@@ -69,7 +76,8 @@ namespace Management
             }
         }
         public Binding[] bindings;
-
+        public Selection[] selections = new Selection[4];
+        
         private void Awake() {
             if (!instance)
                 instance = this;
@@ -77,6 +85,26 @@ namespace Management
                 Destroy(this);
             
             charactersAvailable = Enumerable.Repeat(true, 4).ToArray();
+            colorsAvailable = Enumerable.Repeat(true, 4).ToArray();
+            playerConfirmed = new SelectionEvent();
+            playerUnconfirmed = new SelectionEvent();
+            playerConfirmed.AddListener((id) =>
+            {
+                confirmed++;
+                if (confirmed >= 2)
+                    menuComponents[9].obj.transform.GetChild(2).gameObject.SetActive(true);
+            });
+            playerUnconfirmed.AddListener((id) =>
+            {
+                confirmed--;
+                if (confirmed < 2)
+                    menuComponents[9].obj.transform.GetChild(2).gameObject.SetActive(false);
+            });
+            selections = menuComponents[9].obj.GetComponentsInChildren<Selection>();
+            LeanTween.value(menuComponents[9].obj.transform.GetChild(2).gameObject,value =>
+                {
+                    menuComponents[9].obj.transform.GetChild(2).gameObject.GetComponentsInChildren<TMP_Text>().ToList().ForEach(t => t.fontSize = value);
+                }, 36, 37, 0.4f).setLoopPingPong();
         }
 
         private void Start() {
@@ -96,6 +124,39 @@ namespace Management
             {
                 Debug.LogWarning("This scene doesn't contain event system! Functionality might be reduced. try running persistent scene as root.");
             }
+            
+            // Set Input selections
+            var start = GlobalGameManager.instance.controls.Count >= 4 ? 1 : 0;
+            var id = start;
+            foreach (var control in GlobalGameManager.instance.controls)
+            {
+                if (id > start+4) break;
+                try
+                {
+                    var pair = selections[id];
+                    pair.ObtainControlUnit(control.Value);
+                    pair.InitializeFrameCache();
+                }
+                catch (Exception)
+                {
+                    GlobalConsole.Error("Could not assign control to character selector");
+                }
+                id++;
+            }
+            
+            // Register event listeners
+            
+            GlobalGameManager.connectedInput.AddListener(c =>
+            {
+                foreach (var selection in  menuComponents[9].obj.transform.GetChild(1).GetComponentsInChildren<Selection>())
+                {
+                    if (selection.controlledBy == null)
+                    {
+                        selection.ObtainControlUnit(c);
+                        break;
+                    }
+                }
+            });
 
             // Animations
             LeanTween.rotateZ(menuComponents[7].obj, 22, 20f).setLoopPingPong();
@@ -110,40 +171,39 @@ namespace Management
         // This is the worst thing I coded in my entire life >.<  please don't judge me I have brain damage
         private void Update()
         {
-            if (EventSystem.current != null)
+            if (EventSystem.current == null) return;
+            
+            if (!EventSystem.current.alreadySelecting && EventSystem.current.currentSelectedGameObject == null)
             {
-                if (!EventSystem.current.alreadySelecting && EventSystem.current.currentSelectedGameObject == null)
+                if (previousButton)
                 {
-                    if (previousButton)
-                    {
-                        EventSystem.current.SetSelectedGameObject(previousButton.gameObject);
-                        HighlightButton(previousButton);
-                    }
-                    else if (defaultButton)
-                    {
-                        EventSystem.current.SetSelectedGameObject(defaultButton);
-                    }
+                    EventSystem.current.SetSelectedGameObject(previousButton.gameObject);
+                    HighlightButton(previousButton);
+                }
+                else if (defaultButton)
+                {
+                    EventSystem.current.SetSelectedGameObject(defaultButton);
+                }
+            }
+
+            var selectedObj = EventSystem.current.currentSelectedGameObject;
+            if (selectedObj.TryGetComponent(typeof(Button), out var selectedAsButton))
+            {
+                if (selectedAsButton != previousButton)
+                {
+                    HighlightButton((Button) selectedAsButton);
                 }
 
-                var selectedObj = EventSystem.current.currentSelectedGameObject;
-                if (selectedObj.TryGetComponent(typeof(Button), out var selectedAsButton))
-                {
-                    if (selectedAsButton != previousButton)
-                    {
-                        HighlightButton((Button) selectedAsButton);
-                    }
-
-                    if (previousButton && previousButton != selectedAsButton)
-                    {
-                        UnHighlightButton(previousButton);
-                    }
-
-                    previousButton = (Button) selectedAsButton;
-                }
-                else
+                if (previousButton && previousButton != selectedAsButton)
                 {
                     UnHighlightButton(previousButton);
                 }
+
+                previousButton = (Button) selectedAsButton;
+            }
+            else
+            {
+                UnHighlightButton(previousButton);
             }
         }
 
@@ -159,16 +219,18 @@ namespace Management
 
         
         
-        public void Confirm(int id)
+        public void GlobalConfirm()
         {
-            
+            stage = MenuStages.ArenaSelection;
         }
 
         public void Back()
         {
-            if (stage == MenuStages.CharacterSelection)
+            if (stage == MenuStages.CharacterSelection && !LeanTween.isTweening(menuComponents[9].obj))
             {
                 menuComponents[6].obj.SetActive(true);
+                menuComponents[9].obj.transform.GetChild(1).GetComponentsInChildren<Selection>().ToList()
+                    .ForEach(s => s.confirmed = false);
                 LeanTween.moveY(menuComponents[0].obj, 0, 1f).setDelay(0.5f).setEaseInOutQuad();
                 LeanTween.moveY(menuComponents[1].obj, 0.5f, 1f).setDelay(0.5f).setEaseInOutQuad();
                 LeanTween.moveX(menuComponents[2].obj, 0, 1f).setDelay(0.5f).setEaseInOutQuad();
@@ -180,10 +242,8 @@ namespace Management
                 LeanTween.moveY(menuComponents[12].obj, 0, 1f).setEaseInOutCubic();
                 LeanTween.moveY(menuComponents[9].obj, -10, 1f).setEaseInOutQuad().setOnComplete(() =>
                 {
-                    foreach (var selection in menuComponents[9].obj.transform.GetChild(1).GetComponentsInChildren<Selection>()) { selection.controlledBy = null; }
-                    menuComponents[9].obj.SetActive(false);
                     stage = MenuStages.Menu;
-                
+                    menuComponents[6].obj.GetComponentsInChildren<Button>().ToList().ForEach(b => b.enabled = true);
                     if (GlobalGameManager.instance.discord != null)
                     {
                         GlobalGameManager.activityManager.UpdateActivity(GlobalGameManager.instance.activities["Menu"], (res) =>
@@ -192,7 +252,7 @@ namespace Management
                             {
                                 Debug.Log("Discord activity successfully updated");
                             }
-                        });
+                        }); 
                     }
                 });
                 foreach (var btn in bindings) { btn.button.enabled = true; }
@@ -205,27 +265,9 @@ namespace Management
         // Menu Events
         public void Play()
         {
+            if (LeanTween.isTweening(menuComponents[9].obj)) return;
             foreach (var btn in bindings) { btn.button.enabled = false; }
-            stage = MenuStages.CharacterSelection;
-            menuComponents[9].obj.SetActive(true);
-            var id = 0;
-
-            foreach (var control in GlobalGameManager.instance.controls)
-            {
-                if (id > 4) break;
-                try
-                {
-                    var pair = menuComponents[9].obj.transform.GetChild(1).GetComponentsInChildren<Selection>()[id];
-                    pair.id = id;
-                    pair.controlledBy = control.Value;
-                    pair.InitializeFrameCache();
-                }
-                catch (Exception)
-                {
-                    GlobalConsole.Error("Could not assign control to character selector");
-                }
-                id++;
-            }
+            menuComponents[6].obj.GetComponentsInChildren<Button>().ToList().ForEach(b => b.enabled = false);
             
             LeanTween.moveY(menuComponents[0].obj, 5, 1f).setEaseInOutQuad();
             LeanTween.moveY(menuComponents[1].obj, 6, 1f).setEaseInOutQuad();
@@ -238,8 +280,7 @@ namespace Management
             LeanTween.moveY(menuComponents[12].obj, 2, 1f).setEaseInOutCubic();
             LeanTween.moveY(menuComponents[9].obj, 0, 1f).setEaseInOutQuad().setOnComplete(() =>
             {
-                menuComponents[6].obj.SetActive(false);
-            
+                stage = MenuStages.CharacterSelection;
                 if (GlobalGameManager.instance.discord != null)
                 {
                     GlobalGameManager.activityManager.UpdateActivity(GlobalGameManager.instance.activities["CHSelection"], (res) =>
@@ -270,10 +311,8 @@ namespace Management
             Management.Settings.instance.volume = !Management.Settings.instance.volume;
         }
 
-        public void Default() {
+        private void Default() {
             Debug.Log("Not implemented");
         }
-        
-        
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Console;
 using SharpDX.XInput;
 using SharpDX.DirectInput;
@@ -9,10 +10,13 @@ using Gameplay.Input;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Discord;
+using UnityEditor.PackageManager.UI;
+using UnityEngine.Events;
 using Utilities;
 
 namespace Management
 {
+    public class InputEvent : UnityEvent<Control> { }
     public class GlobalGameManager : MonoBehaviour
     {
         public static GlobalGameManager instance;
@@ -23,6 +27,8 @@ namespace Management
         public Discord.Discord discord;
         public Dictionary<Unid, Control> controls;
         public long startTimestamp;
+        public static InputEvent connectedInput;
+        public static InputEvent disconnectedInput;
         public bool inputOverlay { get; set; }
 
         private Settings settingInstance;
@@ -72,7 +78,8 @@ namespace Management
             startTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             inputOverlay = true;
             Cursor.visible = false;
-            
+            connectedInput = new InputEvent();
+            disconnectedInput = new InputEvent();
             
             // Initialize base classes
             gameCommands = new List<ICommand>();
@@ -84,14 +91,14 @@ namespace Management
                 State = "Currently not in game",
                 Details = "Browsing menu",
                 Timestamps = new ActivityTimestamps()
-                {
+                {                                                            
                     Start = startTimestamp
                 },
                 Assets = new ActivityAssets()
                 {
                     LargeImage = "shield"
                 }
-            });
+            });              
             activities.Add("CHSelection", new Activity {
                 State = "Selecting characters",
                 Details = $"{1} / 4 are ready",
@@ -139,8 +146,8 @@ namespace Management
                 if (!silent) GlobalConsole.Error($"Discord SDK couldn't be loaded\n {e}");
             }
         }
-        
-        public void LogProblemsFunction(LogLevel level, string message)
+
+        private void LogProblemsFunction(LogLevel level, string message)
         { 
             GlobalConsole.Log($"Discord:{level} - {message}");
         }
@@ -167,8 +174,10 @@ namespace Management
                     var controller = new Controller((UserIndex) i);
                     if (controller.IsConnected)
                     {
-                        controls.Add(new Unid((UserIndex) i), new Control(controller));
+                        var cntr = new Control(controller);
+                        controls.Add(new Unid((UserIndex) i), cntr);
                         Debug.Log($"{Input.GetJoystickNames()[(int) controller.UserIndex]} found and connected using xInput");
+                        connectedInput.Invoke(cntr);
                     }
                 }
             }
@@ -186,7 +195,9 @@ namespace Management
                     }*/
                     
                     Debug.Log($"{device.InstanceName} found and connected using dInput");
-                    controls.Add(new Unid(device.InstanceGuid), new Control(stick));
+                    var cntr = new Control(stick);
+                    controls.Add(new Unid(device.InstanceGuid), cntr);
+                    connectedInput.Invoke(cntr);
                 }
             }
 
@@ -199,6 +210,7 @@ namespace Management
                 {
                     Debug.Log($"{control.Value.name} disconnected");
                     delList.Add(control.Key);
+                    disconnectedInput.Invoke(control.Value);
                 }
             }
             foreach (var control in delList) { controls.Remove(control); }
@@ -208,11 +220,12 @@ namespace Management
             {
                 if (control.Value.type != Control.ControlType.XInputController)
                 {
-                    if (controls.ContainsKey(new Unid((UserIndex) Array.IndexOf(Input.GetJoystickNames(),
-                        control.Value.name))))
+                    var others = controls.Where(x => x.Value.type == Control.ControlType.XInputController).ToDictionary(p => p.Key, p => p.Value); // XInput controllers
+                    if (!others.FirstOrDefault(y => y.Key.ExtractUserIndex() == (UserIndex) Array.IndexOf(Input.GetJoystickNames(), control.Value.name)).Equals(default(KeyValuePair<Unid,Control>)))
                     {
                         Debug.Log($"Conflicting dInput for {control.Value.name} removed");
                         delList.Add(control.Key);
+                        disconnectedInput.Invoke(control.Value);
                     }
                 }
             }
@@ -235,7 +248,7 @@ namespace Management
         private void OnGUI()
         {
             var i = 0;
-            var scaleFactor = 1;
+            var scaleFactor = Screen.height/1080f;
             
             if (inputOverlay)
             {
@@ -267,9 +280,7 @@ namespace Management
         public void LoadGame() {
             LoadScene(SceneIndexes.MenuScreen, SceneIndexes.Game);
         }
-        public void LoadCharacterSelection() {
         
-        }
         public float totalLoadingProgress;
         public IEnumerator GetLoadProgress() {
             for(var i = 0; i<loading.Count; i++) {
