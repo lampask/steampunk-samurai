@@ -19,11 +19,7 @@ namespace Definitions
 
         void LoadFakeData()
         {
-            players = new Dictionary<int, PlayerDefinition>
-            {
-                {0, new PlayerDefinition(0, 0, GlobalGameManager.instance.controls[new Unid(UserIndex.One)])},
-            };
-            arenas = new Dictionary<int, ArenaDefinition>();
+            
         }
     }
 }

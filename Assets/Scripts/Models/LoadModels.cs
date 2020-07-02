@@ -18,16 +18,7 @@ namespace Models
 
         void LoadFakeData()
         {
-            players = new Dictionary<int, PlayerModel>()
-            {
-                {0, new PlayerModel(0, 100, 50, GlobalGameManager.instance.controls[new Unid((UserIndex) 1)])}
-            };
-            arenas = new Dictionary<int, ArenaModel>
-            {
-                {0, new ArenaModel()},
-                {1, new ArenaModel()},
-                {2, new ArenaModel()}
-            };
+            
         }
     }
 }

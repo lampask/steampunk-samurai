@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
+using Management;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
 public class MultipleTargetCamera : MonoBehaviour
 {
-    public List<Transform> players;
-
     public Vector3 offset;
     public float smoothTime = .5f;
 
@@ -13,43 +12,41 @@ public class MultipleTargetCamera : MonoBehaviour
     public float maxZoom = 10f;
     public float zoomLimiter = 50f;
 
-    private Vector3 velocity;
-    private Camera cam;
+    private Vector3 _velocity;
+    private Camera _cam;
 
 
     private void Start()
     {
-        cam = GetComponent<Camera>();
+        _cam = GetComponent<Camera>();
     }
 
     private void LateUpdate()
     {
-        if (players.Count == 0)
-            return;
-
         Move();
         Zoom();
     }
 
     private void Zoom()
     {
-        float newZoom = Mathf.Lerp(maxZoom, minZoom, GetGreatestDistance() / zoomLimiter);
-        cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, newZoom, Time.deltaTime);
+        var newZoom = Mathf.Lerp(maxZoom, minZoom, GetGreatestDistance() / zoomLimiter);
+        _cam.orthographicSize = Mathf.Lerp(_cam.orthographicSize, newZoom, Time.smoothDeltaTime);
     }
 
     private void Move()
     {
-        Vector3 centerPoint = GetCenterPoint();
+        var centerPoint = GetCenterPoint();
 
-        Vector3 newPosition = centerPoint + offset;
+        var newPosition = centerPoint + offset;
 
-        transform.position = Vector3.SmoothDamp(transform.position, newPosition, ref velocity, smoothTime);
+        transform.position = Vector3.SmoothDamp(transform.position, newPosition, ref _velocity, smoothTime);
     }
 
     float GetGreatestDistance()
     {
+        var players = LocalGameManager.instance.players.Select(p => p.transform).ToList();
         var bounds = new Bounds(players[0].position, Vector3.zero);
-        for (int i = 0; i < players.Count; i++)
+        for (var i = 0; i < players.Count; i++)
         {
             bounds.Encapsulate(players[i].position);
         }
@@ -59,13 +56,14 @@ public class MultipleTargetCamera : MonoBehaviour
 
     Vector3 GetCenterPoint()
     {
+        var players = LocalGameManager.instance.players.Select(p => p.transform).ToList();
         if (players.Count == 1)
         {
             return players[0].position;
         }
 
         var bounds = new Bounds(players[0].position, Vector3.zero);
-        for (int i = 0; i < players.Count; i++) 
+        for (var i = 0; i < players.Count; i++) 
         {
             bounds.Encapsulate(players[i].position);
         }

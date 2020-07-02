@@ -10,8 +10,8 @@ using Gameplay.Input;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Discord;
-using UnityEditor.PackageManager.UI;
 using UnityEngine.Events;
+using UnityEngine.UI;
 using Utilities;
 
 namespace Management
@@ -20,13 +20,18 @@ namespace Management
     public class GlobalGameManager : MonoBehaviour
     {
         public static GlobalGameManager instance;
+        
         public GameObject loadingScreen;
-        public static DirectInput dInput;
+        public GameObject loadingSinner;
+        public GameObject shade;
+        
         public static ActivityManager activityManager;
         public Dictionary<string, Activity> activities;
         public Discord.Discord discord;
-        public Dictionary<Unid, Control> controls;
         public long startTimestamp;
+        
+        public static DirectInput dInput;
+        public Dictionary<Unid, Control> controls;
         public static InputEvent connectedInput;
         public static InputEvent disconnectedInput;
         public bool inputOverlay { get; set; }
@@ -266,16 +271,42 @@ namespace Management
             inputOverlay = !inputOverlay;
         }
 
-        List<AsyncOperation> loading = new List<AsyncOperation>(); 
+        // SCENE LOADING
+        
+        List<AsyncOperation> loading = new List<AsyncOperation>();
 
-        public void LoadScene(SceneIndexes current, SceneIndexes target) {
-            loadingScreen.SetActive(true);
-
-            loading.Add(SceneManager.UnloadSceneAsync((int) current));
-            loading.Add(SceneManager.LoadSceneAsync((int) SceneIndexes.Game, LoadSceneMode.Additive));
-
-            StartCoroutine(GetLoadProgress());
+        public IEnumerator ToggleLoadingScreen(bool toggle, Action after)
+        {
+            shade.LeanValue(value => {
+                shade.GetComponent<Image>().color = value;
+            }, new Color32(0, 0, 0, 0), new Color(0,0,0,1), 0.5f).setIgnoreTimeScale(true).setOnComplete(() =>
+            {
+                loadingScreen.SetActive(toggle);
+                if (toggle)
+                    // Create tween for loading spinner
+                    loadingSinner.LeanRotateAroundLocal(Vector3.forward, -360, 4f).setLoopClamp();
+                else
+                    LeanTween.cancel(loadingSinner);
+                shade.LeanValue(value =>
+                {
+                    shade.GetComponent<Image>().color = value;
+                }, new Color32(0, 0, 0, 1), new Color(0, 0, 0, 0), 0.5f).setIgnoreTimeScale(true);
+            });
+            yield return new WaitForSeconds(4f);
+            after();
         }
+        
+        public void LoadScene(SceneIndexes current, SceneIndexes target)
+        {
+            StartCoroutine(ToggleLoadingScreen(true, () =>
+            {
+                loading.Add(SceneManager.UnloadSceneAsync((int) current));
+                loading.Add(SceneManager.LoadSceneAsync((int) SceneIndexes.Game, LoadSceneMode.Additive));
+
+                StartCoroutine(GetLoadProgress());
+            }));
+        }
+        
         // default overload
         public void LoadGame() {
             LoadScene(SceneIndexes.MenuScreen, SceneIndexes.Game);
@@ -299,7 +330,7 @@ namespace Management
                 }
             }
             loading.Clear();
-            loadingScreen.SetActive(false);
+            StartCoroutine(ToggleLoadingScreen(false, () => { }));
         }
     }
 }

@@ -75,6 +75,9 @@ namespace Management
                 }
             }
         }
+        
+        // Collections
+        
         public Binding[] bindings;
         public Selection[] selections = new Selection[4];
         
@@ -222,6 +225,7 @@ namespace Management
         public void GlobalConfirm()
         {
             stage = MenuStages.ArenaSelection;
+            GlobalGameManager.instance.LoadGame();
         }
 
         public void Back()

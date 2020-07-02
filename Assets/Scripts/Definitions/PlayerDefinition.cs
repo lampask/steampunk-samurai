@@ -6,13 +6,12 @@ namespace Definitions
     {
         public int id { get; private set; }
         public int color { get; private set; }
-        public Control controls { get; private set; }
-        
-        public PlayerDefinition(int id, int color, Control controls)
+        public int type { get; private set; }
+        public PlayerDefinition(int id, int color, int type)
         {
             this.id = id;
             this.color = color;
-            this.controls = controls;
+            this.type = type;
         }
     }
 }

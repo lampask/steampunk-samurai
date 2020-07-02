@@ -20,9 +20,11 @@ namespace Management
         public static LoadModels models { get; protected set; }
 
         public Transform barObject;
-
-        private List<Tuple<PlayerModel, PlayerDefinition>> playerComponents;
-        private Tuple<ArenaModel, ArenaDefinition> arenaComponents;
+        public Transform cameraObject;
+        public Transform anchor;
+        
+        private List<Tuple<PlayerModel, PlayerDefinition>> _playerComponents;
+        private Tuple<ArenaModel, ArenaDefinition> _arenaComponents;
         
         // IN GAME VARS
 
@@ -40,6 +42,9 @@ namespace Management
         public PlayerEvent roundFinished;
         public UnityEvent powerUpSpawned;
 
+        public float loadProgress;
+        public bool doneLoading;
+        
         private void Awake() {
             if (!instance)
                 instance = this;
@@ -50,15 +55,66 @@ namespace Management
             if (onPlayerHealthChangeEvent == null) onPlayerHealthChangeEvent = new PlayerEvent();
             if (onPlayerEnergyChangeEvent == null) onPlayerEnergyChangeEvent = new PlayerEvent();
 
-            playerComponents = MenuManager.instance.selections.Where(s => s.confirmed).ToList().Select(s => s.ConvertToDefiningComponents()).ToList();
-            //arenaComponents = MenuManager.instance.arena.ConvertToDefiningComponents();
+            _playerComponents = MenuManager.instance.selections.Where(s => s.confirmed).ToList().Select(s => s.ConvertToDefiningComponents()).ToList();
+            _arenaComponents = /*MenuManager.instance.arena.ConvertToDefiningComponents();*/ DefaultArena();
             
             // Initialize easily accessible bridge
-            playerData = playerComponents.ToDictionary(p => p.Item1.id);
+            playerData = _playerComponents.ToDictionary(p => p.Item1.id);
 
 
             // We're freezing bois ...
-            Time.timeScale = 0;
+            //Time.timeScale = 0;
+        }
+        
+        // TEMP CODE
+        // TODO: Remove and use in arena selector
+        private Tuple<ArenaModel, ArenaDefinition> DefaultArena()
+        {
+            var model = new ArenaModel();
+            var definition = new ArenaDefinition(
+                new Dictionary<int, List<SpawnPoint>>()
+                {
+                    {2, new List<SpawnPoint>()
+                    {
+                        new SpawnPoint(new Vector2(-30,-3.5f), true),
+                        new SpawnPoint(new Vector2(30,-3.5f), false)
+                    }},
+                    {3, new List<SpawnPoint>()
+                    {
+                        new SpawnPoint(new Vector2(0,-10), true),
+                        new SpawnPoint(new Vector2(30,15), true),
+                        new SpawnPoint(new Vector2(-30,15), false)
+                    }},
+                    {4, new List<SpawnPoint>()
+                    {
+                        new SpawnPoint(new Vector2(30,-13), true),
+                        new SpawnPoint(new Vector2(-30,-13), false),
+                        new SpawnPoint(new Vector2(30,15), true),
+                        new SpawnPoint(new Vector2(-30,15), false)
+                    }}
+                },
+                new List<Building>()
+                {
+                    new Building(new Vector2(0, 0), 0, "budova1"),
+                    new Building(new Vector2(30, 0), 0, "budova2"),
+                    new Building(new Vector2(-30, 0), 0, "budova2"),
+                }, 
+                new List<Zone>()
+                {
+                    
+                }, 
+                new List<Background>()
+                {
+                    new Background("pozadie", 0f, new Vector2(0,0)),
+                    new Background("mesiac", 1f, -2, new Vector2(0,20)),
+                    new Background("hmla", 1f, 100, new Vector2(0,9)),
+                },
+                new List<Effect>()
+                {
+                    
+                }
+            );
+            return new Tuple<ArenaModel, ArenaDefinition>(model, definition);
         }
         
         private void Start()
@@ -78,27 +134,29 @@ namespace Management
             
             // 0 
             var bgs = new GameObject("Backgrounds");
-            foreach (var b in arenaComponents.Item2.backgrounds)
+            foreach (var b in _arenaComponents.Item2.backgrounds)
             {
-                var a = (GameObject) Instantiate(Resources.Load($"Prefabs/Backgrounds/{b.asset}"), Vector3.zero,
+                var a = (GameObject) Instantiate(Resources.Load("Backgrounds/Background"), Vector2.zero + b.offset,
                     Quaternion.identity);
                 a.transform.SetParent(bgs.transform);
-                a.GetComponent<SpriteRenderer>().sortingOrder = (int) b.parallaxPosition;
+                var sr = a.GetComponent<SpriteRenderer>();
+                sr.sortingOrder = b.layer;
+                sr.sprite = Resources.Load<Sprite>($"Backgrounds/{b.asset}");
             }
             
             // 1
             var buildings = new GameObject("Buildings");
-            foreach (var b in arenaComponents.Item2.buildings)
+            foreach (var b in _arenaComponents.Item2.buildings)
             {
-                var a = (GameObject) Instantiate(Resources.Load($"Prefabs/Buildings/{b.asset}"), b.position,
+                var a = (GameObject) Instantiate(Resources.Load($"Buildings/{b.asset}"), b.position,
                     Quaternion.identity);
-                a.transform.SetParent(bgs.transform);
-                a.GetComponent<SpriteRenderer>().sortingOrder = b.layer;
+                a.transform.SetParent(buildings.transform);
+                //a.GetComponent<SpriteRenderer>().sortingOrder = b.layer;
             }
             
             // 2 (idk will be used in future)
             var effects = new GameObject("Effects");
-            arenaComponents.Item2.effects.ForEach(e => Instantiate(new GameObject(), e.position, Quaternion.identity).transform.SetParent(effects.transform));
+            _arenaComponents.Item2.effects.ForEach(e => Instantiate(new GameObject(), e.position, Quaternion.identity).transform.SetParent(effects.transform));
             
             // Create hierarchy
 
@@ -106,23 +164,33 @@ namespace Management
             buildings.transform.SetParent(arena.transform);
             effects.transform.SetParent(arena.transform);
             
+            arena.transform.SetParent(anchor);
+            
             
             // Load Players into generated arena
             
             // Shuffle spawn points
             var rnd = new Random();
-            var spawnPoints = arenaComponents.Item2.spawnLocations[MenuManager.instance.confirmed]
+            var spawnPoints =  new Stack<SpawnPoint>(_arenaComponents.Item2.spawnLocations[MenuManager.instance.confirmed]
                 .Select(x => new {value = x, order = rnd.Next()})
-                .OrderBy(x => x.order).Select(x => x.value).ToList();
+                .OrderBy(x => x.order).Select(x => x.value).ToList());
             
-            playerComponents.ForEach(c =>
+            _playerComponents.ForEach(c =>
             {
-                players.Add(Instantiate(Imports.PlayerObject,
-                    spawnPoints[c.Item1.id].position,
-                    Quaternion.identity).GetComponent<PlayerBehaviour>());
+                var p = Instantiate(Imports.PlayerObject,
+                    spawnPoints.Pop().position,
+                    Quaternion.identity);
+                
+                var pb = p.GetComponent<PlayerBehaviour>();
+                players.Add(pb);
+
+                pb.id = c.Item1.id;
+                pb.controlledBy = c.Item1.control;
                 
                 // Generate bars ==> PlayerInfo Objects
-                ((GameObject) Instantiate(Resources.Load("Prefabs/Bar"))).transform.SetParent(barObject);
+                ((GameObject) Instantiate(Resources.Load("PlayerInfo"), Vector3.zero, Quaternion.identity)).transform.SetParent(barObject);
+                
+                p.transform.SetParent(anchor);
             });
             
         }
