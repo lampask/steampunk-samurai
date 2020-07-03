@@ -54,8 +54,9 @@ namespace Management
                 Destroy(this);
             
             // Initialize events
-            if (onPlayerHealthChangeEvent == null) onPlayerHealthChangeEvent = new PlayerEvent();
-            if (onPlayerEnergyChangeEvent == null) onPlayerEnergyChangeEvent = new PlayerEvent();
+            if (onPlayerHealthChangeEvent == null) onPlayerHealthChangeEvent = new PlayerEvent(); else onPlayerHealthChangeEvent.RemoveAllListeners();
+            if (onPlayerEnergyChangeEvent == null) onPlayerEnergyChangeEvent = new PlayerEvent(); else onPlayerEnergyChangeEvent.RemoveAllListeners();
+            if (onPlayerDeath == null) onPlayerDeath = new PlayerEvent(); else onPlayerDeath.RemoveAllListeners();
 
             _playerComponents = MenuManager.instance.selections.Where(s => s.confirmed).ToList().Select(s => s.ConvertToDefiningComponents()).ToList();
             _arenaComponents = /*MenuManager.instance.arena.ConvertToDefiningComponents();*/ DefaultArena();
@@ -179,16 +180,18 @@ namespace Management
             
             _playerComponents.ForEach(c =>
             {
+                var sp = spawnPoints.Pop();
                 var p = Instantiate(Imports.PlayerObject,
-                    spawnPoints.Pop().position,
+                    sp.position,
                     Quaternion.identity);
                 
                 var pb = p.GetComponent<PlayerBehaviour>();
                 players.Add(pb);
-
+                
                 pb.id = c.Item1.id;
                 pb.controlledBy = c.Item1.control;
                 pb.playerReference = c;
+                pb.reversed = !sp.facing;
                 
                 // Generate bars ==> PlayerInfo Objects
                 var barObj = ((GameObject) Instantiate(Resources.Load("PlayerInfo"), Vector3.zero, Quaternion.identity));
@@ -205,10 +208,34 @@ namespace Management
                     if (pInfo.id == pId)
                         pInfo.hBar.percentage = (float) c.Item1.health / c.Item2.maxHealth * 100f;
                 });
-                
+                onPlayerDeath.AddListener((pId) =>
+                {
+                    if (!players[pId].dead)
+                        players[pId].Die();
+                });
                 p.transform.SetParent(anchor);
             });
             
+        }
+
+        private void ResetArena()
+        {
+            // Shuffle spawn points
+            var rnd = new Random();
+            var spawnPoints =  new Stack<SpawnPoint>(_arenaComponents.Item2.spawnLocations[MenuManager.instance.confirmed]
+                .Select(x => new {value = x, order = rnd.Next()})
+                .OrderBy(x => x.order).Select(x => x.value).ToList());
+            
+            players.ForEach(p =>
+            {
+                var sp = spawnPoints.Pop();
+                p.gameObject.SetActive(true);
+                p.dead = false;
+                p.transform.position = sp.position;
+                p.reversed = !sp.facing;
+                p.playerReference.Item1.health = p.playerReference.Item2.maxHealth;
+                p.playerReference.Item1.energy = p.playerReference.Item2.maxEnergy;
+            });
         }
 
         void LoadComponents()

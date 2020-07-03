@@ -61,11 +61,13 @@ namespace UI
             rTransform.sizeDelta = new Vector2(defaultBarWidth, defaultBarHeight);
             _fill.sizeDelta = new Vector2(_fill.sizeDelta.x, defaultBarHeight);
 
+            _fill.rotation = reversed ? Quaternion.Euler(0, 180, 0) : Quaternion.identity;
+
             var sizeDelta = border.sizeDelta;
             var maxWidth = sizeDelta.x - offset.x - offset.y;
             rTransform.anchoredPosition3D = new Vector3((reversed ? 1 : 0) * (maxWidth-defaultBarWidth) - maxWidth/2, rTransform.anchoredPosition3D.y, 0);
             // Customization
-            barFill.fillAmount = percentage/100;
+            barFill.fillAmount = Mathf.Lerp(barFill.fillAmount, percentage/100, Time.deltaTime * 3);
             barFill.color = barFillColor;
         }
     }

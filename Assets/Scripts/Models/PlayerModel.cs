@@ -18,10 +18,9 @@ namespace Models
                 {
                     _health = value;
                     LocalGameManager.instance.onPlayerHealthChangeEvent.Invoke(id);
+                    if (_health <= 0)
+                        LocalGameManager.instance.onPlayerDeath.Invoke(id);
                 }
-
-                if (_health <= 0)
-                    LocalGameManager.instance.onPlayerDeath.Invoke(id);
             }
         }
 

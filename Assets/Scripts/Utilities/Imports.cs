@@ -15,6 +15,20 @@ namespace Utilities
             Resources.Load<Sprite>("Characters/four"),
             Resources.Load<Sprite>("Characters/default")
         };
+        public static readonly List<Sprite> Colors = new List<Sprite>()
+        {
+            Resources.Load<Sprite>("UI/IG/flak1"), 
+            Resources.Load<Sprite>("UI/IG/flak2"),
+            Resources.Load<Sprite>("UI/IG/flak3"),
+            Resources.Load<Sprite>("UI/IG/flak4"),
+        };
+        public static readonly List<Sprite> Masks = new List<Sprite>()
+        {
+            Resources.Load<Sprite>("UI/IG/maska1"), 
+            Resources.Load<Sprite>("UI/IG/maska2"),
+            Resources.Load<Sprite>("UI/IG/maska3"),
+            Resources.Load<Sprite>("UI/IG/maska4"),
+        };
         public static readonly Dictionary<string, GameObject> BuildingObjects = new Dictionary<string, GameObject>
         {
             {"building1", Resources.Load("Objects/building1") as GameObject}

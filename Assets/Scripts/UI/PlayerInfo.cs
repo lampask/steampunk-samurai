@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Management;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Utilities;
 
 namespace UI
 {
@@ -11,9 +10,7 @@ namespace UI
     {
         public int id;
         private Image[] _imgs;
-
-        [FormerlySerializedAs("player_icon")] public Sprite playerIcon;
-
+        
         private RectTransform _rt;
 
         public Bar hBar;
@@ -21,7 +18,6 @@ namespace UI
         
         private void Awake() {
             _imgs = GetComponentsInChildren<Image>();
-            _imgs[0].sprite = playerIcon;
             _rt = GetComponent<RectTransform>();
         }
 
@@ -33,10 +29,12 @@ namespace UI
             if (index > 3) {
                 Destroy(this.gameObject);
             }
+            _imgs[1].sprite = Imports.Masks[id];;
+            _imgs[0].sprite = Imports.Colors[id];
         }
 
         private void Reverse() {
-            new List<Image>() {_imgs[0], _imgs[1]}.ForEach(i => i.gameObject.GetComponent<RectTransform>().anchoredPosition *= Vector2.left);
+            new List<Image>() {_imgs[0], _imgs[1], _imgs[2]}.ForEach(i => i.gameObject.GetComponent<RectTransform>().anchoredPosition *= Vector2.left);
             foreach(var barObject in GetComponents<Bar>()) {
                 barObject.reversed = true;
             }

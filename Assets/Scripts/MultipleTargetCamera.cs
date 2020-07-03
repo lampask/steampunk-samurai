@@ -23,8 +23,11 @@ public class MultipleTargetCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        Move();
-        Zoom();
+        if (LocalGameManager.instance.players.Where(p => !p.dead).ToList().Count > 0)
+        {
+            Move();
+            Zoom();
+        }
     }
 
     private void Zoom()
@@ -44,19 +47,19 @@ public class MultipleTargetCamera : MonoBehaviour
 
     float GetGreatestDistance()
     {
-        var players = LocalGameManager.instance.players.Select(p => p.transform).ToList();
+        var players = LocalGameManager.instance.players.Where(p => !p.dead).ToList().Select(p => p.transform).ToList();
         var bounds = new Bounds(players[0].position, Vector3.zero);
         for (var i = 0; i < players.Count; i++)
         {
             bounds.Encapsulate(players[i].position);
         }
 
-        return bounds.size.x;
-    }
+        return Mathf.Max(bounds.size.x, bounds.size.y);
+    } 
 
     Vector3 GetCenterPoint()
     {
-        var players = LocalGameManager.instance.players.Select(p => p.transform).ToList();
+        var players = LocalGameManager.instance.players.Where(p => !p.dead).ToList().Select(p => p.transform).ToList();
         if (players.Count == 1)
         {
             return players[0].position;
