@@ -32,10 +32,13 @@ namespace UI
         [FormerlySerializedAs("bar_fill")] public Image barFill;
         [FormerlySerializedAs("bar_bg")] public Image barBg;
 
-        private RectTransform fill;
-        private RectTransform bg;
+        public RectTransform border;
+        public Vector2 offset = new Vector2(50, 50);
+        
+        private RectTransform _fill;
+        private RectTransform _bg;
 
-        void Start()
+        private void Start()
         {
             rTransform = barObject.GetComponent<RectTransform>();
             rTransform.anchorMin.Half();
@@ -44,32 +47,23 @@ namespace UI
             barFill = rTransform.GetChild(0).gameObject.GetComponent<Image>();
             barBg = rTransform.GetChild(1).GetComponent<Image>();
 
-            fill = barFill.GetComponent<RectTransform>();
-            bg = barBg.GetComponent<RectTransform>();
+            _fill = barFill.GetComponent<RectTransform>();
+            _bg = barBg.GetComponent<RectTransform>();
 
-            foreach(var g in new[] {fill, bg}) {
+            foreach(var g in new[] {_fill, _bg}) {
                 g.anchorMin = Vector2.zero;
-                g.anchorMax = Vector2.right;
+                g.anchorMax = Vector2.one;
             }
         }
 
-        void Update()
+        private void Update()
         {
             rTransform.sizeDelta = new Vector2(defaultBarWidth, defaultBarHeight);
-            var sizeDelta = bg.sizeDelta;
-            fill.sizeDelta = new Vector2(sizeDelta.x, defaultBarHeight*(5/6f));
-            sizeDelta = new Vector2(sizeDelta.x, defaultBarHeight);
-            bg.sizeDelta = sizeDelta;
+            _fill.sizeDelta = new Vector2(_fill.sizeDelta.x, defaultBarHeight);
 
-            rTransform.anchoredPosition3D = new Vector3((reversed ? -1 : 1) * (defaultBarWidth/2-40), rTransform.anchoredPosition3D.y, 0);
-            var anchoredPosition3D = bg.anchoredPosition3D;
-            fill.anchoredPosition3D = new Vector3(anchoredPosition3D.x, defaultBarHeight/2, 0);
-            anchoredPosition3D = new Vector3(anchoredPosition3D.x, defaultBarHeight/2, 0);
-            bg.anchoredPosition3D = anchoredPosition3D;
-
-            fill.offsetMin = new Vector2(2, 0);
-            fill.offsetMax = new Vector2(-2, defaultBarHeight);
-
+            var sizeDelta = border.sizeDelta;
+            var maxWidth = sizeDelta.x - offset.x - offset.y;
+            rTransform.anchoredPosition3D = new Vector3((reversed ? 1 : 0) * (maxWidth-defaultBarWidth) - maxWidth/2, rTransform.anchoredPosition3D.y, 0);
             // Customization
             barFill.fillAmount = percentage/100;
             barFill.color = barFillColor;

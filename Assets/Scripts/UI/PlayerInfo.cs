@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Management;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -7,11 +9,15 @@ namespace UI
 {
     public class PlayerInfo : MonoBehaviour
     {
+        public int id;
         private Image[] _imgs;
 
         [FormerlySerializedAs("player_icon")] public Sprite playerIcon;
 
         private RectTransform _rt;
+
+        public Bar hBar;
+        public Bar eBar;
         
         private void Awake() {
             _imgs = GetComponentsInChildren<Image>();
@@ -30,7 +36,7 @@ namespace UI
         }
 
         private void Reverse() {
-            _imgs[0].gameObject.GetComponent<RectTransform>().anchoredPosition *= Vector2.left;
+            new List<Image>() {_imgs[0], _imgs[1]}.ForEach(i => i.gameObject.GetComponent<RectTransform>().anchoredPosition *= Vector2.left);
             foreach(var barObject in GetComponents<Bar>()) {
                 barObject.reversed = true;
             }

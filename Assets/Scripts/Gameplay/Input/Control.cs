@@ -3,7 +3,6 @@ using Management;
 using SharpDX.DirectInput;
 using SharpDX.XInput;
 using UnityEngine;
-using UnityEngine.Events;
 using Utilities;
 
 namespace Gameplay.Input

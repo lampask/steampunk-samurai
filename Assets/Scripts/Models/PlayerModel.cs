@@ -15,7 +15,13 @@ namespace Models
             set
             {
                 if (value != _health)
+                {
+                    _health = value;
                     LocalGameManager.instance.onPlayerHealthChangeEvent.Invoke(id);
+                }
+
+                if (_health <= 0)
+                    LocalGameManager.instance.onPlayerDeath.Invoke(id);
             }
         }
 
@@ -26,7 +32,10 @@ namespace Models
             set
             {
                 if (value != _energy)
+                {
+                    _energy = value;
                     LocalGameManager.instance.onPlayerEnergyChangeEvent.Invoke(id);
+                }
             }
         }
         

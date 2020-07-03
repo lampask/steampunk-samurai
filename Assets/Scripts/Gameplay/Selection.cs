@@ -196,7 +196,7 @@ namespace Gameplay
         public Tuple<PlayerModel, PlayerDefinition> ConvertToDefiningComponents()
         {
             var model = new PlayerModel(id,100,100, controlledBy);
-            var definition = new PlayerDefinition(id, colorSelection.colorIndex, characterSelection.characterIndex);
+            var definition = new PlayerDefinition(id, colorSelection.colorIndex, characterSelection.characterIndex, 100, 100);
             return new Tuple<PlayerModel, PlayerDefinition>(model, definition);
         }
         

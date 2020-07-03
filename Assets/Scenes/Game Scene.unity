@@ -341,7 +341,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 1453403275
   m_SortingOrder: 2000
   m_TargetDisplay: 0
@@ -423,7 +423,7 @@ MonoBehaviour:
   m_StartCorner: 0
   m_StartAxis: 0
   m_CellSize: {x: 490, y: 120}
-  m_Spacing: {x: 960, y: 30}
+  m_Spacing: {x: 920, y: 30}
   m_Constraint: 1
   m_ConstraintCount: 2
 --- !u!222 &1668436912

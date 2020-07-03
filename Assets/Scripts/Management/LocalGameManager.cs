@@ -7,6 +7,7 @@ using UnityEngine.Events;
 using Definitions;
 using GameEnvironment;
 using Models;
+using UI;
 using Utilities;
 using Random = System.Random;
 
@@ -37,6 +38,7 @@ namespace Management
         
         public PlayerEvent onPlayerHealthChangeEvent;
         public PlayerEvent onPlayerEnergyChangeEvent;
+        public PlayerEvent onPlayerDeath;
         public UnityEvent gameStart;
         public UnityEvent gameOver;
         public PlayerEvent roundFinished;
@@ -186,9 +188,23 @@ namespace Management
 
                 pb.id = c.Item1.id;
                 pb.controlledBy = c.Item1.control;
+                pb.playerReference = c;
                 
                 // Generate bars ==> PlayerInfo Objects
-                ((GameObject) Instantiate(Resources.Load("PlayerInfo"), Vector3.zero, Quaternion.identity)).transform.SetParent(barObject);
+                var barObj = ((GameObject) Instantiate(Resources.Load("PlayerInfo"), Vector3.zero, Quaternion.identity));
+                barObj.transform.SetParent(barObject);
+                var pInfo = barObj.GetComponent<PlayerInfo>();
+                pInfo.id = c.Item1.id;
+                onPlayerEnergyChangeEvent.AddListener((pId) =>
+                {
+                    if (pInfo.id == pId)
+                        pInfo.eBar.percentage = (float) c.Item1.energy / c.Item2.maxEnergy * 100f;
+                });
+                onPlayerHealthChangeEvent.AddListener((pId) =>
+                {
+                    if (pInfo.id == pId)
+                        pInfo.hBar.percentage = (float) c.Item1.health / c.Item2.maxHealth * 100f;
+                });
                 
                 p.transform.SetParent(anchor);
             });
